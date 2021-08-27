@@ -1,0 +1,13 @@
+
+.idea/
+bin/
+target/
+libs/
+
+.DS_Store
+*.class
+*.iml
+*.ipr
+*.iws
+
+src/main/resources/database.properties

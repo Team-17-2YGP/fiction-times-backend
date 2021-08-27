@@ -1,0 +1,5 @@
+db.driver.class=com.mysql.jdbc.Driver
+db.conn.url=jdbc:mysql://localhost:${PORT}/fictionTimes
+db.username=${USERNAME}
+db.password=${PASSWORD}
+
