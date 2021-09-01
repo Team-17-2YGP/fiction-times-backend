@@ -5,8 +5,10 @@ import com.example.fictionTimesBackend.Model.User;
 import com.example.fictionTimesBackend.Repository.DBConnection;
 import com.example.fictionTimesBackend.Repository.UserRepository;
 import com.example.fictionTimesBackend.Service.UserService;
+import com.example.fictionTimesBackend.Utils.AuthUtils;
 import com.example.fictionTimesBackend.Utils.ServletUtils;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +29,9 @@ public class UserRegistrationServlet extends HttpServlet {
         try {
             user = userService.createNewUser(user);
             payload = ServletUtils.getGson().toJson(user);
+            Cookie cookie = new Cookie("AUTH_TOKEN", AuthUtils.generateAuthToken(user));
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             String message = e.getMessage();

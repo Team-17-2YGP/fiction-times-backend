@@ -2,6 +2,7 @@ package com.example.fictionTimesBackend.Service;
 
 import com.example.fictionTimesBackend.Model.User;
 import com.example.fictionTimesBackend.Repository.UserRepository;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -18,11 +19,7 @@ public class UserService {
     }
 
     public User createNewUser(User user) throws NoSuchAlgorithmException, SQLException, IOException, ClassNotFoundException {
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        messageDigest.update(user.getPassword().getBytes());
-        byte[] digest = messageDigest.digest();
-        String password = DatatypeConverter.printHexBinary(digest);
-        user.setPassword(password);
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return userRepository.createNewUser(user);
     }
 }
