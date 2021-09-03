@@ -9,11 +9,11 @@ import java.util.Properties;
 public class DBConnection {
     private static Connection connection = null;
 
-    public Connection getConnection() throws IOException, ClassNotFoundException, SQLException {
+    public static Connection getConnection() throws IOException, ClassNotFoundException, SQLException {
         if (connection == null) {
             // Load the properties from application properties
             Properties properties = new Properties();
-            properties.load(getClass().getResourceAsStream("/database.properties"));
+            properties.load(DBConnection.class.getResourceAsStream("/database.properties"));
             String driverClass = properties.getProperty("db.driver.class");
             String dbUrl = properties.getProperty("db.conn.url");
             String userName = properties.getProperty("db.username");

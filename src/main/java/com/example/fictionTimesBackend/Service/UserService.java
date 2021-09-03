@@ -4,9 +4,7 @@ import com.example.fictionTimesBackend.Model.User;
 import com.example.fictionTimesBackend.Repository.UserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 

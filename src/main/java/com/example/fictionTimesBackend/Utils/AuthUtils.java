@@ -1,9 +1,11 @@
 package com.example.fictionTimesBackend.Utils;
 
 import com.example.fictionTimesBackend.Model.Auth.TokenBody;
+import com.example.fictionTimesBackend.Model.Types.UserType;
 import com.example.fictionTimesBackend.Model.User;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class AuthUtils {
@@ -16,5 +18,20 @@ public class AuthUtils {
         String base64Body = Base64.getEncoder().encodeToString(ServletUtils.getGson().toJson(tokenBody).getBytes());
         token = base64Body + "." + DigestUtils.sha256Hex(base64Body + secret);
         return token;
+    }
+
+    public static boolean isAuthorised(String token, UserType[] endpointRoles) {
+        String[] destructuredToken = token.split("\\.");
+        if (!DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
+            return false;
+        }
+        String tokenBodyString = new String(Base64.getDecoder().decode(destructuredToken[0]), StandardCharsets.UTF_8);
+        TokenBody tokenBody = ServletUtils.getGson().fromJson(tokenBodyString, TokenBody.class);
+        for (UserType endpointRole: endpointRoles) {
+            if (endpointRole.equals(tokenBody.getUserType())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -9,15 +9,10 @@ import java.sql.SQLException;
 
 public class UserRepository {
 
-    private final DBConnection dbConnection;
     private PreparedStatement statement;
 
-    public UserRepository(DBConnection dbConnection) {
-        this.dbConnection = dbConnection;
-    }
-
     public User createNewUser(User user) throws SQLException, IOException, ClassNotFoundException {
-        statement = dbConnection.getConnection().prepareStatement(
+        statement = DBConnection.getConnection().prepareStatement(
                 "INSERT INTO user (userName, firstName, lastName, password, email, addressLane1, " +
                         "addressLane2, city, country, phoneNumber, profilePictureUrl, userType, userStatus) " +
                         "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",

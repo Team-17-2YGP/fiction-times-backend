@@ -20,7 +20,7 @@ import java.sql.SQLException;
 @WebServlet("/user/registration")
 public class UserRegistrationServlet extends HttpServlet {
 
-    private final UserService userService = new UserService(new UserRepository(new DBConnection()));
+    private final UserService userService = new UserService(new UserRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
