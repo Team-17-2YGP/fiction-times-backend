@@ -20,4 +20,13 @@ public class UserService {
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return userRepository.createNewUser(user);
     }
+
+    public User checkCredentials(User user) throws SQLException, IOException, ClassNotFoundException {
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        User matchedUser = userRepository.findUserByUserName(user.getUserName());
+        if (matchedUser != null && matchedUser.getPassword().equals(user.getPassword())) {
+            return matchedUser;
+        }
+        return null;
+    }
 }

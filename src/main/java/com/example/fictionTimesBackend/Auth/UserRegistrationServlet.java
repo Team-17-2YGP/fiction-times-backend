@@ -2,13 +2,11 @@ package com.example.fictionTimesBackend.Auth;
 
 import com.example.fictionTimesBackend.Model.DTO.UserRegistrationErrorDTO;
 import com.example.fictionTimesBackend.Model.User;
-import com.example.fictionTimesBackend.Repository.DBConnection;
 import com.example.fictionTimesBackend.Repository.UserRepository;
 import com.example.fictionTimesBackend.Service.UserService;
 import com.example.fictionTimesBackend.Utils.AuthUtils;
-import com.example.fictionTimesBackend.Utils.ServletUtils;
+import com.example.fictionTimesBackend.Utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,14 +22,12 @@ public class UserRegistrationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        User user = ServletUtils.getGson().fromJson(request.getReader(), User.class);
+        User user = CommonUtils.getGson().fromJson(request.getReader(), User.class);
         String payload;
         try {
             user = userService.createNewUser(user);
-            payload = ServletUtils.getGson().toJson(user);
-            Cookie cookie = new Cookie("AUTH_TOKEN", AuthUtils.generateAuthToken(user));
-            cookie.setHttpOnly(true);
-            response.addCookie(cookie);
+            payload = CommonUtils.getGson().toJson(user);
+            response.addCookie(AuthUtils.generateAuthCookie(user));
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             String message = e.getMessage();
@@ -47,7 +43,7 @@ public class UserRegistrationServlet extends HttpServlet {
                 error = message;
             }
             UserRegistrationErrorDTO errorDTO = new UserRegistrationErrorDTO(error, user);
-            payload = ServletUtils.getGson().toJson(errorDTO);
+            payload = CommonUtils.getGson().toJson(errorDTO);
         }
         response.setContentType("application/json");
         response.getWriter().write(payload);

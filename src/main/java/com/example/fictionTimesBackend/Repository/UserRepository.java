@@ -1,5 +1,7 @@
 package com.example.fictionTimesBackend.Repository;
 
+import com.example.fictionTimesBackend.Model.Types.UserStatus;
+import com.example.fictionTimesBackend.Model.Types.UserType;
 import com.example.fictionTimesBackend.Model.User;
 
 import java.io.IOException;
@@ -37,5 +39,30 @@ public class UserRepository {
             user.setUserId(resultSet.getInt(1));
         }
         return user;
+    }
+
+    public User findUserByUserName(String userName) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE userName = ?");
+        statement.setString(1, userName);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new User(
+                    resultSet.getInt("userId"),
+                    resultSet.getString("userName"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getString("password"),
+                    resultSet.getString("email"),
+                    resultSet.getString("addressLane1"),
+                    resultSet.getString("addressLane2"),
+                    resultSet.getString("city"),
+                    resultSet.getString("country"),
+                    resultSet.getString("phoneNumber"),
+                    resultSet.getString("profilePictureUrl"),
+                    UserType.valueOf(resultSet.getString("userType")),
+                    UserStatus.valueOf(resultSet.getString("userStatus"))
+            );
+        }
+        return null;
     }
 }
