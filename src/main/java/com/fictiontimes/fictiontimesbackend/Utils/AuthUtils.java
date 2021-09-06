@@ -1,8 +1,8 @@
-package com.example.fictionTimesBackend.Utils;
+package com.fictiontimes.fictiontimesbackend.Utils;
 
-import com.example.fictionTimesBackend.Model.Auth.TokenBody;
-import com.example.fictionTimesBackend.Model.Types.UserType;
-import com.example.fictionTimesBackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.Model.Auth.TokenBody;
+import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.Model.User;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.digest.DigestUtils;
 

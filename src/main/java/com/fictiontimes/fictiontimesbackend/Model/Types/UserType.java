@@ -1,4 +1,4 @@
-package com.example.fictionTimesBackend.Model.Types;
+package com.fictiontimes.fictiontimesbackend.Model.Types;
 
 public enum UserType {
     ADMIN,

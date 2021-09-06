@@ -1,6 +1,6 @@
-package com.example.fictionTimesBackend.Model.DTO;
+package com.fictiontimes.fictiontimesbackend.Model.DTO;
 
-import com.example.fictionTimesBackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.Model.User;
 
 public class UserRegistrationErrorDTO {
     private String error;

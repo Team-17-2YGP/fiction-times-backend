@@ -1,10 +1,10 @@
-package com.example.fictionTimesBackend.Auth;
+package com.fictiontimes.fictiontimesbackend.Auth;
 
-import com.example.fictionTimesBackend.Model.User;
-import com.example.fictionTimesBackend.Repository.UserRepository;
-import com.example.fictionTimesBackend.Service.UserService;
-import com.example.fictionTimesBackend.Utils.AuthUtils;
-import com.example.fictionTimesBackend.Utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.Repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.Service.UserService;
+import com.fictiontimes.fictiontimesbackend.Utils.AuthUtils;
+import com.fictiontimes.fictiontimesbackend.Utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,13 +24,13 @@ public class LogInServlet extends HttpServlet {
         try {
             User matchedUser = userService.checkCredentials(user);
             if (matchedUser != null) {
-                response.setStatus(200);
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 response.addCookie(AuthUtils.generateAuthCookie(matchedUser));
             } else {
-                response.setStatus(401);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException | ClassNotFoundException exception) {
-            response.setStatus(500);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             exception.printStackTrace();
         }
     }
