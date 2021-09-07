@@ -1,0 +1,32 @@
+package com.fictiontimes.fictiontimesbackend.Service;
+
+import com.fictiontimes.fictiontimesbackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.Repository.UserRepository;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public User createNewUser(User user) throws NoSuchAlgorithmException, SQLException, IOException, ClassNotFoundException {
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        return userRepository.createNewUser(user);
+    }
+
+    public User checkCredentials(User user) throws SQLException, IOException, ClassNotFoundException {
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        User matchedUser = userRepository.findUserByUserName(user.getUserName());
+        if (matchedUser != null && matchedUser.getPassword().equals(user.getPassword())) {
+            return matchedUser;
+        }
+        return null;
+    }
+}
