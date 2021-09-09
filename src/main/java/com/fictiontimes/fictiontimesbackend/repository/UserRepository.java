@@ -1,8 +1,8 @@
-package com.fictiontimes.fictiontimesbackend.Repository;
+package com.fictiontimes.fictiontimesbackend.repository;
 
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserStatus;
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.User;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;

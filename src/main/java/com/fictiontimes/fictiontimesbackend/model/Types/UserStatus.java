@@ -1,4 +1,4 @@
-package com.fictiontimes.fictiontimesbackend.Model.Types;
+package com.fictiontimes.fictiontimesbackend.model.Types;
 
 public enum UserStatus {
     BANNED,

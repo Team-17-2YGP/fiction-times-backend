@@ -1,7 +1,8 @@
-package com.fictiontimes.fictiontimesbackend.Auth;
+package com.fictiontimes.fictiontimesbackend.auth;
 
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.Utils.AuthUtils;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
+import com.fictiontimes.fictiontimesbackend.exception.CookieExpiredException;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,10 +19,16 @@ public class ReaderInterceptor implements Filter {
         String token = AuthUtils.extractAuthToken(request.getCookies());
         boolean isNotAuthorised = false;
         if (token != null) {
-            if (AuthUtils.isAuthorised(token, UserType.READER)) {
-                filterChain.doFilter(servletRequest, servletResponse);
-            } else {
-                isNotAuthorised = true;
+            try {
+                if (AuthUtils.isAuthorised(token, UserType.READER)) {
+                    filterChain.doFilter(servletRequest, servletResponse);
+                } else {
+                    isNotAuthorised = true;
+                }
+            } catch (CookieExpiredException e) {
+                HttpServletResponse response = (HttpServletResponse) servletResponse;
+                response.addCookie(AuthUtils.removeAuthCookie());
+                e.printStackTrace();
             }
         } else {
             isNotAuthorised = true;

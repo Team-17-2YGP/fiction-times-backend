@@ -1,8 +1,9 @@
-package com.fictiontimes.fictiontimesbackend.Utils;
+package com.fictiontimes.fictiontimesbackend.utils;
 
-import com.fictiontimes.fictiontimesbackend.Model.Auth.TokenBody;
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.Model.User;
+import com.fictiontimes.fictiontimesbackend.model.Auth.TokenBody;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.exception.CookieExpiredException;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -23,7 +24,7 @@ public class AuthUtils {
         return token;
     }
 
-    public static boolean isAuthorised(String token, UserType endpointRole) {
+    public static boolean isAuthorised(String token, UserType endpointRole) throws CookieExpiredException {
         String[] destructuredToken = token.split("\\.");
         if (!DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
             return false;
@@ -31,9 +32,7 @@ public class AuthUtils {
         String tokenBodyString = new String(Base64.getDecoder().decode(destructuredToken[0]), StandardCharsets.UTF_8);
         TokenBody tokenBody = CommonUtils.getGson().fromJson(tokenBodyString, TokenBody.class);
         if (tokenBody.getExpDate().before(new Date())) {
-            // TODO: Destroy the cookie when this exception is caught
-            // TODO: Make a specific custom exception for cookie expired
-            return false;
+            throw new CookieExpiredException("Auth token expired");
         }
         return endpointRole.equals(tokenBody.getUserType());
     }
@@ -58,6 +57,14 @@ public class AuthUtils {
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(18000);
+        return cookie;
+    }
+
+    public static Cookie removeAuthCookie() {
+        Cookie cookie = new Cookie("AUTH_TOKEN", "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
         return cookie;
     }
 }

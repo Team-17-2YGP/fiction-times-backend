@@ -1,4 +1,4 @@
-package com.fictiontimes.fictiontimesbackend.Repository;
+package com.fictiontimes.fictiontimesbackend.repository;
 
 import java.io.IOException;
 import java.sql.Connection;
