@@ -3,7 +3,6 @@ package com.fictiontimes.fictiontimesbackend.Utils;
 import com.fictiontimes.fictiontimesbackend.Model.Auth.TokenBody;
 import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.Model.User;
-import com.sun.deploy.net.cookie.CookieUnavailableException;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -24,7 +23,7 @@ public class AuthUtils {
         return token;
     }
 
-    public static boolean isAuthorised(String token, UserType[] endpointRoles) throws CookieUnavailableException {
+    public static boolean isAuthorised(String token, UserType endpointRole) {
         String[] destructuredToken = token.split("\\.");
         if (!DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
             return false;
@@ -34,14 +33,24 @@ public class AuthUtils {
         if (tokenBody.getExpDate().before(new Date())) {
             // TODO: Destroy the cookie when this exception is caught
             // TODO: Make a specific custom exception for cookie expired
-            throw new CookieUnavailableException();
+            return false;
         }
-        for (UserType endpointRole: endpointRoles) {
-            if (endpointRole.equals(tokenBody.getUserType())) {
-                return true;
-            }
+        return endpointRole.equals(tokenBody.getUserType());
+    }
+
+    public static String extractAuthToken(Cookie[] cookies) {
+        Cookie authCookie = null;
+        if (cookies == null) {
+            return null;
         }
-        return false;
+        for (Cookie cookie: cookies) {
+            if (cookie.getName().equals("AUTH_TOKEN"))
+                authCookie = cookie;
+        }
+        if (authCookie == null) {
+            return null;
+        }
+        return authCookie.getValue();
     }
 
     public static Cookie generateAuthCookie(User user) {
