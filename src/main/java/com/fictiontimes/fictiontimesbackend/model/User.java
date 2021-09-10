@@ -1,7 +1,7 @@
-package com.fictiontimes.fictiontimesbackend.Model;
+package com.fictiontimes.fictiontimesbackend.model;
 
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserStatus;
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 
 public class User {
     private int userId;

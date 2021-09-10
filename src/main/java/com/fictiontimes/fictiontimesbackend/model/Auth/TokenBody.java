@@ -1,7 +1,7 @@
-package com.fictiontimes.fictiontimesbackend.Model.Auth;
+package com.fictiontimes.fictiontimesbackend.model.Auth;
 
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserStatus;
-import com.fictiontimes.fictiontimesbackend.Model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 
 import java.util.Date;
 

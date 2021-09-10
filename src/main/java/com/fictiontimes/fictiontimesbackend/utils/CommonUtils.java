@@ -1,4 +1,4 @@
-package com.fictiontimes.fictiontimesbackend.Utils;
+package com.fictiontimes.fictiontimesbackend.utils;
 
 import com.google.gson.Gson;
 

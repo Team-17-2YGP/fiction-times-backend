@@ -1,10 +1,10 @@
-package com.fictiontimes.fictiontimesbackend.Auth;
+package com.fictiontimes.fictiontimesbackend.auth;
 
-import com.fictiontimes.fictiontimesbackend.Model.User;
-import com.fictiontimes.fictiontimesbackend.Repository.UserRepository;
-import com.fictiontimes.fictiontimesbackend.Service.UserService;
-import com.fictiontimes.fictiontimesbackend.Utils.AuthUtils;
-import com.fictiontimes.fictiontimesbackend.Utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.service.UserService;
+import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,7 @@
-package com.fictiontimes.fictiontimesbackend.Service;
+package com.fictiontimes.fictiontimesbackend.service;
 
-import com.fictiontimes.fictiontimesbackend.Model.User;
-import com.fictiontimes.fictiontimesbackend.Repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
