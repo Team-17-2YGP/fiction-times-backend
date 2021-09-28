@@ -40,6 +40,26 @@ public class User {
         this.userStatus = userStatus;
     }
 
+    public User(String userName, String firstName,
+                String lastName, String password, String email,
+                String addressLane1, String addressLane2, String city,
+                String country, String phoneNumber, String profilePictureUrl,
+                UserType userType, UserStatus userStatus) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+        this.addressLane1 = addressLane1;
+        this.addressLane2 = addressLane2;
+        this.city = city;
+        this.country = country;
+        this.phoneNumber = phoneNumber;
+        this.profilePictureUrl = profilePictureUrl;
+        this.userType = userType;
+        this.userStatus = userStatus;
+    }
+
     public int getUserId() {
         return userId;
     }

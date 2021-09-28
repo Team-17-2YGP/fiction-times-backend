@@ -3,8 +3,11 @@ package com.fictiontimes.fictiontimesbackend.repository;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
+import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,5 +67,26 @@ public class UserRepository {
             );
         }
         return null;
+    }
+
+    public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "INSERT INTO writerApplicant (userId, response, respondedAt, requestedAt, previousWork, " +
+                        "socialMediaUrls, landline, addressLane1, addressLane2, city, country)" +
+                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        statement.setInt(1, applicant.getUserId());
+        statement.setString(2, applicant.getResponse());
+        statement.setDate(3, null);
+        statement.setDate(4, new Date(applicant.getRequestedAt().getTime()));
+        statement.setString(5, FileUtils.saveFile(applicant.getPreviousWork()));
+        statement.setString(6, applicant.getSocialMediaUrls());
+        statement.setString(7, applicant.getLandline());
+        statement.setString(8, applicant.getBusinessAddressLane1());
+        statement.setString(9, applicant.getBusinessAddressLane2());
+        statement.setString(10, applicant.getBusinessAddressCity());
+        statement.setString(11, applicant.getBusinessAddressCountry());
+        statement.execute();
+        return applicant;
     }
 }
