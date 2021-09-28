@@ -11,3 +11,4 @@ libs/
 *.iws
 
 src/main/resources/database.properties
+src/main/resources/awsS3.properties

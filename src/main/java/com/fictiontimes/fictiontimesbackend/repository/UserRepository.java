@@ -4,6 +4,7 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
+import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -78,14 +79,14 @@ public class UserRepository {
         statement.setString(2, applicant.getResponse());
         statement.setDate(3, null);
         statement.setDate(4, new Date(applicant.getRequestedAt().getTime()));
-        // TODO: get the multipart file, upload it to someplace and put the path as a string here
-        statement.setString(5, "");
+        statement.setString(5, FileUtils.saveFile(applicant.getPreviousWork()));
         statement.setString(6, applicant.getSocialMediaUrls());
         statement.setString(7, applicant.getLandline());
         statement.setString(8, applicant.getBusinessAddressLane1());
         statement.setString(9, applicant.getBusinessAddressLane2());
         statement.setString(10, applicant.getBusinessAddressCity());
         statement.setString(11, applicant.getBusinessAddressCountry());
+        statement.execute();
         return applicant;
     }
 }
