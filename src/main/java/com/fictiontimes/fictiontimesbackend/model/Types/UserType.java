@@ -3,5 +3,6 @@ package com.fictiontimes.fictiontimesbackend.model.Types;
 public enum UserType {
     ADMIN,
     READER,
-    WRITER
+    WRITER,
+    WRITER_APPLICANT
 }

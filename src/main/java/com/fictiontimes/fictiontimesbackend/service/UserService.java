@@ -1,12 +1,14 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class UserService {
 
@@ -28,5 +30,12 @@ public class UserService {
             return matchedUser;
         }
         return null;
+    }
+
+    public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        applicant.setRequestedAt(new Date());
+        applicant.setResponse("");
+        applicant.setRespondedAt(null);
+        return userRepository.registerWriterApplicant(applicant);
     }
 }
