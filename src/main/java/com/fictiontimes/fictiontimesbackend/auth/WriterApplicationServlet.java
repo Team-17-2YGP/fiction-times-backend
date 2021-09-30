@@ -1,6 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.auth;
 
-import com.fictiontimes.fictiontimesbackend.model.DTO.UserRegistrationErrorDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
@@ -73,7 +73,7 @@ public class WriterApplicationServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 error = message;
             }
-            UserRegistrationErrorDTO errorDTO = new UserRegistrationErrorDTO(error, applicant);
+            ErrorDTO<WriterApplicant> errorDTO = new ErrorDTO<>(error, applicant);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
         response.setContentType("application/json");

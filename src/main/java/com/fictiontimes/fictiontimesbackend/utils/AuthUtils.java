@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.utils;
 
 import com.fictiontimes.fictiontimesbackend.model.Auth.TokenBody;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.exception.CookieExpiredException;
@@ -31,6 +32,7 @@ public class AuthUtils {
         }
         String tokenBodyString = new String(Base64.getDecoder().decode(destructuredToken[0]), StandardCharsets.UTF_8);
         TokenBody tokenBody = CommonUtils.getGson().fromJson(tokenBodyString, TokenBody.class);
+        if (tokenBody.getUserStatus() != UserStatus.ACTIVATED) return false;
         if (tokenBody.getExpDate().before(new Date())) {
             throw new CookieExpiredException("Auth token expired");
         }
