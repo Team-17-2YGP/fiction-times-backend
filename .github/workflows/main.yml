@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CD
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [master]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Deploy on DigitalOcean Droplet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Setting up database.properties
+        run: |
+          touch ./src/main/resources/database.properties
+          echo "db.driver.class=com.mysql.jdbc.Driver
+          db.conn.url=jdbc:mysql://localhost:3306/fictionTimes?autoReconnect=true
+          db.username=${{ secrets.ocean_db_user }}
+          db.password=${{ secrets.ocean_db_password }}
+          " >> ./src/main/resources/database.properties
+          cat ./src/main/resources/database.properties
+      - name: Building war
+        run: mvn -B clean package
+      - name: Copy war to remote
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: ./target/fiction-times-backend-1.0-SNAPSHOT.war
+          remote: /root/webapps/ROOT.war
+          host: ${{ secrets.ocean_host }}
+          username: ${{ secrets.ocean_user }}
+          password: ${{ secrets.ocean_pass }}
+          tryKeyboard: true
