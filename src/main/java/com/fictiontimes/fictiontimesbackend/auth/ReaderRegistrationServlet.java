@@ -1,7 +1,9 @@
 package com.fictiontimes.fictiontimesbackend.auth;
 
 import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
-import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.service.UserService;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
@@ -15,19 +17,22 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
-@WebServlet("/user/registration")
-public class UserRegistrationServlet extends HttpServlet {
+@WebServlet("/user/reader/registration")
+public class ReaderRegistrationServlet extends HttpServlet {
 
     private final UserService userService = new UserService(new UserRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        User user = CommonUtils.getGson().fromJson(request.getReader(), User.class);
+        Reader reader = CommonUtils.getGson().fromJson(request.getReader(), Reader.class);
         String payload;
         try {
-            user = userService.createNewUser(user);
-            payload = CommonUtils.getGson().toJson(user);
-            response.addCookie(AuthUtils.generateAuthCookie(user));
+            reader.setUserType(UserType.READER);
+            reader.setUserStatus(UserStatus.PENDING);
+            reader.setUserId(userService.createNewUser(reader).getUserId());
+            payload = CommonUtils.getGson().toJson(userService.registerReader(reader));
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            response.addCookie(AuthUtils.generateAuthCookie(reader));
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             String message = e.getMessage();
@@ -42,11 +47,10 @@ public class UserRegistrationServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 error = message;
             }
-            ErrorDTO<User> errorDTO = new ErrorDTO<>(error, user);
+            ErrorDTO<Reader> errorDTO = new ErrorDTO<>(error, reader);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_CREATED);
         response.getWriter().write(payload);
     }
 }

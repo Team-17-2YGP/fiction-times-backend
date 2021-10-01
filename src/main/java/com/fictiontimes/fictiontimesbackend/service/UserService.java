@@ -1,5 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
+import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereFormDTO;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
+import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
@@ -37,5 +40,14 @@ public class UserService {
         applicant.setResponse("");
         applicant.setRespondedAt(null);
         return userRepository.registerWriterApplicant(applicant);
+    }
+
+    public PayhereFormDTO registerReader(Reader reader) throws SQLException, IOException, ClassNotFoundException {
+        reader.setSubscriptionStatus(SubscriptionStatus.PENDING);
+        reader = userRepository.registerReader(reader);
+        return new PayhereFormDTO(
+                reader.getFirstName(), reader.getLastName(), reader.getEmail(), reader.getPhoneNumber(),
+                reader.getAddressLane1(), reader.getAddressLane2(), reader.getCity(), reader.getCountry()
+        );
     }
 }

@@ -60,6 +60,8 @@ public class User {
         this.userStatus = userStatus;
     }
 
+    public User() {}
+
     public int getUserId() {
         return userId;
     }

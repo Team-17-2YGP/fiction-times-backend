@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
+import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
@@ -69,6 +70,31 @@ public class UserRepository {
         return null;
     }
 
+    public User findUserByEmail(String email) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE email = ?");
+        statement.setString(1, email);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new User(
+                    resultSet.getInt("userId"),
+                    resultSet.getString("userName"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getString("password"),
+                    resultSet.getString("email"),
+                    resultSet.getString("addressLane1"),
+                    resultSet.getString("addressLane2"),
+                    resultSet.getString("city"),
+                    resultSet.getString("country"),
+                    resultSet.getString("phoneNumber"),
+                    resultSet.getString("profilePictureUrl"),
+                    UserType.valueOf(resultSet.getString("userType")),
+                    UserStatus.valueOf(resultSet.getString("userStatus"))
+            );
+        }
+        return null;
+    }
+
     public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
         statement = DBConnection.getConnection().prepareStatement(
                 "INSERT INTO writerApplicant (userId, response, respondedAt, requestedAt, previousWork, " +
@@ -88,5 +114,15 @@ public class UserRepository {
         statement.setString(11, applicant.getBusinessAddressCountry());
         statement.execute();
         return applicant;
+    }
+
+    public Reader registerReader(Reader reader) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "INSERT INTO reader (userId, subscriptionStatus) VALUES (?, ?)"
+        );
+        statement.setInt(1, reader.getUserId());
+        statement.setString(2, reader.getSubscriptionStatus().toString());
+        statement.execute();
+        return reader;
     }
 }
