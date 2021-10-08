@@ -22,6 +22,7 @@ public class UserService {
     }
 
     public User createNewUser(User user) throws NoSuchAlgorithmException, SQLException, IOException, ClassNotFoundException {
+        user.setProfilePictureUrl("https://ui-avatars.com/api/?name=" + user.getFirstName() + "+" + user.getLastName());
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return userRepository.createNewUser(user);
     }
@@ -49,5 +50,9 @@ public class UserService {
                 reader.getFirstName(), reader.getLastName(), reader.getEmail(), reader.getPhoneNumber(),
                 reader.getAddressLane1(), reader.getAddressLane2(), reader.getCity(), reader.getCountry()
         );
+    }
+
+    public User getUserByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
+        return userRepository.findUserByUserId(userId);
     }
 }

@@ -27,7 +27,6 @@ public class UserRegistrationServlet extends HttpServlet {
         try {
             user = userService.createNewUser(user);
             payload = CommonUtils.getGson().toJson(user);
-            response.addCookie(AuthUtils.generateAuthCookie(user));
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             String message = e.getMessage();

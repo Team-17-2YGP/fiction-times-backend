@@ -25,7 +25,7 @@ public class LogInServlet extends HttpServlet {
             User matchedUser = userService.checkCredentials(user);
             if (matchedUser != null) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                response.addCookie(AuthUtils.generateAuthCookie(matchedUser));
+                response.getWriter().print(AuthUtils.generateAuthToken(matchedUser));
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }

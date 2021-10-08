@@ -125,4 +125,29 @@ public class UserRepository {
         statement.execute();
         return reader;
     }
+
+    public User findUserByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE userId = ?");
+        statement.setInt(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new User(
+                    resultSet.getInt("userId"),
+                    resultSet.getString("userName"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getString("password"),
+                    resultSet.getString("email"),
+                    resultSet.getString("addressLane1"),
+                    resultSet.getString("addressLane2"),
+                    resultSet.getString("city"),
+                    resultSet.getString("country"),
+                    resultSet.getString("phoneNumber"),
+                    resultSet.getString("profilePictureUrl"),
+                    UserType.valueOf(resultSet.getString("userType")),
+                    UserStatus.valueOf(resultSet.getString("userStatus"))
+            );
+        }
+        return null;
+    }
 }
