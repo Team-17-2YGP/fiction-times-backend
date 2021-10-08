@@ -57,7 +57,6 @@ public class WriterApplicationServlet extends HttpServlet {
             applicant.setUserId(userService.createNewUser(applicant).getUserId());
             applicant = userService.registerWriterApplicant(applicant);
             payload = CommonUtils.getGson().toJson(applicant);
-            response.addCookie(AuthUtils.generateAuthCookie(applicant));
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();

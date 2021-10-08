@@ -32,7 +32,6 @@ public class ReaderRegistrationServlet extends HttpServlet {
             reader.setUserId(userService.createNewUser(reader).getUserId());
             payload = CommonUtils.getGson().toJson(userService.registerReader(reader));
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.addCookie(AuthUtils.generateAuthCookie(reader));
         } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             String message = e.getMessage();
