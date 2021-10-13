@@ -17,6 +17,7 @@ public class WriterApplicant extends User{
     private String landline;
     private String socialMediaUrls;
     private Part previousWork;
+    private String previousWorkUrl;
 
     public WriterApplicant(
             int userId,
@@ -97,6 +98,8 @@ public class WriterApplicant extends User{
         this.previousWork = previousWork;
     }
 
+    public WriterApplicant() {}
+
     public String getBusinessAddressLane1() {
         return businessAddressLane1;
     }
@@ -175,5 +178,13 @@ public class WriterApplicant extends User{
 
     public void setPreviousWork(Part previousWork) {
         this.previousWork = previousWork;
+    }
+
+    public String getPreviousWorkUrl() {
+        return previousWorkUrl;
+    }
+
+    public void setPreviousWorkUrl(String previousWorkUrl) {
+        this.previousWorkUrl = previousWorkUrl;
     }
 }
