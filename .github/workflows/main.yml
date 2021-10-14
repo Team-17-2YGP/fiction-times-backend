@@ -31,6 +31,13 @@ jobs:
           db.password=${{ secrets.ocean_db_password }}
           " >> ./src/main/resources/database.properties
           cat ./src/main/resources/database.properties
+      - name: Setting up awsS3.properties
+        run: |
+          touch ./src/main/resources/awsS3.properties
+          echo "aws.access.key.id=${{ secrets.aws_key }}
+          aws.secret.access.key=${{ secrets.aws_secret }}
+          " >> ./src/main/resources/awsS3.properties
+          cat ./src/main/resources/awsS3.properties
       - name: Building war
         run: mvn -B clean package
       - name: Copy war to remote
