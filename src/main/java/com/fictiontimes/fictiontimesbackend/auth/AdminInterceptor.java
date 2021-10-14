@@ -5,13 +5,11 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter("/admin/*")
 public class AdminInterceptor implements Filter {
 
     @Override
