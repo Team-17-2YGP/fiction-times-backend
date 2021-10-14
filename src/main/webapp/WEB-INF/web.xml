@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <filter>
+        <filter-name>CORSInterceptor</filter-name>
+        <filter-class>com.fictiontimes.fictiontimesbackend.controller.CORSInterceptor</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <filter>
+        <filter-name>AdminInterceptor</filter-name>
+        <filter-class>com.fictiontimes.fictiontimesbackend.auth.AdminInterceptor</filter-class>
+    </filter>
+    <filter>
+        <filter-name>WriterInterceptor</filter-name>
+        <filter-class>com.fictiontimes.fictiontimesbackend.auth.WriterInterceptor</filter-class>
+    </filter>
+    <filter>
+        <filter-name>ReaderInterceptor</filter-name>
+        <filter-class>com.fictiontimes.fictiontimesbackend.auth.ReaderInterceptor</filter-class>
+    </filter>
+    <filter>
+        <filter-name>ApplicantInterceptor</filter-name>
+        <filter-class>com.fictiontimes.fictiontimesbackend.auth.ApplicantInterceptor</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CORSInterceptor</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminInterceptor</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>WriterInterceptor</filter-name>
+        <url-pattern>/writer/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ReaderInterceptor</filter-name>
+        <url-pattern>/reader/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ApplicantInterceptor</filter-name>
+        <url-pattern>/applicant/*</url-pattern>
+    </filter-mapping>
+
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>hello</servlet-name>-->
+<!--        <url-pattern>/hello-servlet</url-pattern>-->
+<!--    </servlet-mapping>-->
+
+</web-app>
