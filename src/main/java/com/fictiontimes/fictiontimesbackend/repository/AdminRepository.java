@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.repository;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,5 +60,16 @@ public class AdminRepository {
             return applicant;
         }
         return null;
+    }
+
+    public void setApplicantAdminResponse(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "UPDATE writerApplicant SET response = ?, respondedAt = ?, requestedAt = ? WHERE userId = ?"
+        );
+        statement.setString(1, applicant.getResponse());
+        statement.setDate(2, new Date(applicant.getRespondedAt().getTime()));
+        statement.setDate(3, new Date(applicant.getRequestedAt().getTime()));
+        statement.setInt(4, applicant.getUserId());
+        statement.execute();
     }
 }

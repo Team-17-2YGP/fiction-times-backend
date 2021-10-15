@@ -31,6 +31,7 @@ public class GetApplicantsServlet extends HttpServlet {
                     response.getWriter().write(CommonUtils.getGson().toJson(applicant));
                 }
             } catch (SQLException | ClassNotFoundException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 e.printStackTrace();
             }
         } else {
@@ -39,6 +40,7 @@ public class GetApplicantsServlet extends HttpServlet {
                 response.setContentType("application/json");
                 response.getWriter().write(CommonUtils.getGson().toJson(adminService.getApplicantList()));
             } catch (SQLException | ClassNotFoundException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 e.printStackTrace();
             }
         }

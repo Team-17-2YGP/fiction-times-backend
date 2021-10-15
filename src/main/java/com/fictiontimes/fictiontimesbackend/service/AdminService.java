@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 public class AdminService{
@@ -21,5 +22,11 @@ public class AdminService{
 
     public WriterApplicant getApplicantByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
         return adminRepository.getApplicantByUserId(userId);
+    }
+
+    public void setApplicantAdminResponse(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        applicant.setRespondedAt(new Date());
+        applicant.setRequestedAt(new Date());
+        adminRepository.setApplicantAdminResponse(applicant);
     }
 }
