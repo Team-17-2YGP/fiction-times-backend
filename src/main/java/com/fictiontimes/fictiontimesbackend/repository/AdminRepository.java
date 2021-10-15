@@ -2,7 +2,6 @@ package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
-import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -19,7 +18,7 @@ public class AdminRepository {
     public List<WriterApplicant> getApplicantList() throws SQLException, IOException, ClassNotFoundException {
         List<WriterApplicant> applicantList = new ArrayList<>();
         statement = DBConnection.getConnection().prepareStatement(
-                "SELECT * FROM writerApplicant"
+                "SELECT * FROM writerApplicant ORDER BY requestedAt DESC"
         );
         ResultSet resultSet = statement.executeQuery();
         while(resultSet.next()) {

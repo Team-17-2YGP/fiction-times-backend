@@ -1,12 +1,12 @@
 package com.fictiontimes.fictiontimesbackend.utils;
 
 import com.fictiontimes.fictiontimesbackend.exception.InvalidTokenException;
+import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import com.fictiontimes.fictiontimesbackend.model.Auth.TokenBody;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
-import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 

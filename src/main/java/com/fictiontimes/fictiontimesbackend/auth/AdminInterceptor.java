@@ -1,9 +1,9 @@
 package com.fictiontimes.fictiontimesbackend.auth;
 
+import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
-import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

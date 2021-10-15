@@ -6,7 +6,6 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.service.UserService;
-import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

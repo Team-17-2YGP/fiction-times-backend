@@ -4,8 +4,8 @@ import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.ApplicantRepository;
 
 import java.io.IOException;
-import java.util.Date;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class ApplicantService {
 

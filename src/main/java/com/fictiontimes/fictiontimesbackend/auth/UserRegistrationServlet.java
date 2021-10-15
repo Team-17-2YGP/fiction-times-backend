@@ -4,7 +4,6 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.service.UserService;
-import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
