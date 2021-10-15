@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
+import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -70,6 +72,45 @@ public class AdminRepository {
         statement.setDate(2, new Date(applicant.getRespondedAt().getTime()));
         statement.setDate(3, new Date(applicant.getRequestedAt().getTime()));
         statement.setInt(4, applicant.getUserId());
+        statement.execute();
+    }
+
+    public void deleteApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "DELETE FROM writerApplicant WHERE userId = ?"
+        );
+        statement.setInt(1, applicant.getUserId());
+        statement.execute();
+    }
+
+    public void changeApplicantUserType(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "UPDATE user SET userType = ? WHERE userId = ?"
+        );
+        statement.setString(1, UserType.WRITER.toString());
+        statement.setInt(2, applicant.getUserId());
+        statement.execute();
+    }
+
+    public void createNewWriter(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "INSERT INTO writer (userId, landline, addressLane1, addressLane2, city, country)" +
+                        "VALUES(?, ?, ?, ?, ?, ?)"
+        );
+        statement.setInt(1, applicant.getUserId());
+        statement.setString(2, applicant.getLandline());
+        statement.setString(3, applicant.getBusinessAddressLane1());
+        statement.setString(4, applicant.getBusinessAddressLane2());
+        statement.setString(5, applicant.getBusinessAddressCity());
+        statement.setString(6, applicant.getBusinessAddressCountry());
+        statement.execute();
+    }
+
+    public void deleteUser(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "DELETE FROM user WHERE userId = ?"
+        );
+        statement.setInt(1, applicant.getUserId());
         statement.execute();
     }
 }

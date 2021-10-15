@@ -29,4 +29,17 @@ public class AdminService{
         applicant.setRequestedAt(new Date());
         adminRepository.setApplicantAdminResponse(applicant);
     }
+
+    public void approveApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        applicant = getApplicantByUserId(applicant.getUserId());
+        adminRepository.changeApplicantUserType(applicant);
+        adminRepository.createNewWriter(applicant);
+        adminRepository.deleteApplicant(applicant);
+    }
+
+    public void rejectApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+        // TODO: Send the rejection email
+        adminRepository.deleteApplicant(applicant);
+        adminRepository.deleteUser(applicant);
+    }
 }
