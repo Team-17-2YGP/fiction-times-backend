@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class ApplicantRepository {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private PreparedStatement statement;
 
     public ApplicantRepository(UserRepository userRepository) {
