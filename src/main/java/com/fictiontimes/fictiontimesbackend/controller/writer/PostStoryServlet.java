@@ -6,6 +6,7 @@ import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
+import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.service.StoryService;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
@@ -26,7 +27,7 @@ import java.util.Date;
 @MultipartConfig
 public class PostStoryServlet extends HttpServlet {
 
-    private final StoryService storyService = new StoryService(new StoryRepository());
+    private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
@@ -48,7 +49,7 @@ public class PostStoryServlet extends HttpServlet {
             story = new Story(0,userId,title, description, 0, "someCoverArt.s3bucket.com",
                     status, releasedDate, tags, genres);
 
-            storyService.createNewStory(story);
+            story = storyService.createNewStory(story);
 
             payload = CommonUtils.getGson().toJson(story);
             response.setStatus(HttpServletResponse.SC_CREATED);
