@@ -1,8 +1,10 @@
 package com.fictiontimes.fictiontimesbackend.model;
 
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
+import jakarta.servlet.http.Part;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Story {
     private int storyId;
@@ -11,20 +13,22 @@ public class Story {
     private String description;
     private int likeCount;
     private String coverArtUrl;
+    private Part coverArt;
     private StoryStatus status;
     private Timestamp releasedDate;
-    private String tags; // TODO: create tag model class
-    private String genres; // TODO: create genre model class
+    private List<String> tags;
+    private List<Genre> genres;
 
     public Story(int storyId, int userId, String title, String description, int likeCount, String coverArtUrl,
-                 StoryStatus status,
-                 Timestamp releasedDate, String tags, String genres) {
+                 Part coverArt, StoryStatus status,
+                 Timestamp releasedDate, List<String> tags, List<Genre> genres) {
         this.storyId = storyId;
         this.userId = userId;
         this.title = title;
         this.description = description;
         this.likeCount = likeCount;
         this.coverArtUrl = coverArtUrl;
+        this.coverArt = coverArt;
         this.status = status;
         this.releasedDate = releasedDate;
         this.tags = tags;
@@ -79,6 +83,14 @@ public class Story {
         this.coverArtUrl = coverArtUrl;
     }
 
+    public Part getCoverArt() {
+        return coverArt;
+    }
+
+    public void setCoverArt(Part coverArt) {
+        this.coverArt = coverArt;
+    }
+
     public StoryStatus getStatus() {
         return status;
     }
@@ -95,19 +107,19 @@ public class Story {
         this.releasedDate = releasedDate;
     }
 
-    public String getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
-    public String getGenres() {
+    public List<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(String genres) {
+    public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
 }
