@@ -6,12 +6,16 @@ import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 public class UserService {
 
@@ -40,7 +44,15 @@ public class UserService {
         applicant.setRequestedAt(new Date());
         applicant.setResponse("");
         applicant.setRespondedAt(null);
-        return userRepository.registerWriterApplicant(applicant);
+        applicant = userRepository.registerWriterApplicant(applicant);
+        EmailUtils.sendMail(
+                applicant,
+                "New Fiction Times Profile Email Verification",
+                "To continue creating your new fiction times account please verify your email address.",
+                CommonUtils.getDomain() + "/user/activate?token=" +
+                        AuthUtils.generateVerificationToken(applicant)
+        );
+        return applicant;
     }
 
     public PayhereFormDTO registerReader(Reader reader) throws SQLException, IOException, ClassNotFoundException {
@@ -54,5 +66,25 @@ public class UserService {
 
     public User getUserByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
         return userRepository.findUserByUserId(userId);
+    }
+
+    public void sendNewWriterRegistrationRequestNotification(User applicant) {
+        // TODO: Add this as a notification
+        List<User> adminUsers = userRepository.getAdminUsers();
+        EmailUtils.sendEmailBulk(
+                adminUsers,
+                "New Writer Registration Request",
+                "A new writer registration request is waiting for your review <br />"
+                        + "Review Id: " +  applicant.getUserId() + "<br />",
+                CommonUtils.getFrontendAddress() + "/login"
+        );
+    }
+
+    public void activateUserProfile(User user) {
+        try {
+            userRepository.activateUserProfile(user);
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
