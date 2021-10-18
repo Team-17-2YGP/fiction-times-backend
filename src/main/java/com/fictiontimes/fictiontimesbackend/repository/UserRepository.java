@@ -12,6 +12,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository {
 
@@ -149,5 +151,46 @@ public class UserRepository {
             );
         }
         return null;
+    }
+
+    public List<User> getAdminUsers() {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user WHERE userType = ?"
+            );
+            statement.setString(1, UserType.ADMIN.toString());
+            ResultSet resultSet = statement.executeQuery();
+            List<User> adminUsers = new ArrayList<>();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setUserId(resultSet.getInt("userId"));
+                user.setUserName(resultSet.getString("userName"));
+                user.setFirstName(resultSet.getString("firstName"));
+                user.setLastName(resultSet.getString("lastName"));
+                user.setEmail(resultSet.getString("email"));
+                user.setAddressLane1(resultSet.getString("addressLane1"));
+                user.setAddressLane2(resultSet.getString("addressLane2"));
+                user.setCity(resultSet.getString("city"));
+                user.setCountry(resultSet.getString("country"));
+                user.setPhoneNumber(resultSet.getString("phoneNumber"));
+                user.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                user.setUserType(UserType.valueOf(resultSet.getString("userType")));
+                user.setUserStatus(UserStatus.valueOf(resultSet.getString("userStatus")));
+                adminUsers.add(user);
+            }
+            return adminUsers;
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void activateUserProfile(User user) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "UPDATE user SET userStatus = ? WHERE userId = ?"
+        );
+        statement.setString(1, UserStatus.ACTIVATED.toString());
+        statement.setInt(2, user.getUserId());
+        statement.execute();
     }
 }

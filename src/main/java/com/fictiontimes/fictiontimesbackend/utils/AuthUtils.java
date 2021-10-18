@@ -59,4 +59,20 @@ public class AuthUtils {
         if (token == null) throw new TokenNotFoundException("Auth token not found in the header");
         return token;
     }
+
+    public static String generateVerificationToken(User user) {
+        String base64UserId = Base64.getEncoder()
+                .encodeToString(String.valueOf(user.getUserId()).getBytes(StandardCharsets.UTF_8));
+        return  base64UserId + "." + DigestUtils.sha256Hex(base64UserId + secret);
+    }
+
+    public static boolean verifyVerificationToken(String token) {
+        String[] destructuredToken = token.split("\\.");
+        return DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1]);
+    }
+
+    public static int getUserIdByEmailToken(String token) {
+        String[] destructuredToken = token.split("\\.");
+        return Integer.parseInt(new String(Base64.getDecoder().decode(destructuredToken[0]), StandardCharsets.UTF_8));
+    }
 }

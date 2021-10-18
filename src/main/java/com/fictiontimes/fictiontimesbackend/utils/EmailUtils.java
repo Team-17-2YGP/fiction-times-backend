@@ -8,6 +8,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 public class EmailUtils {
@@ -44,11 +45,13 @@ public class EmailUtils {
             );
             message.setSubject(subject);
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            String content = "Dear "+ user.getFirstName() + " " + user.getLastName()
+            String content = "Hello "+ user.getFirstName() + " " + user.getLastName()
                     + ", <br /> <br />"
                     + body
                     + "<br /> <br />"
                     + "<a href=\"" + link + "\">Click here</a>"
+                    + "<br /> <br />"
+                    + "Cheers <br/> Fiction times team"
                     ;
             mimeBodyPart.setContent(content, "text/html");
             Multipart multipart = new MimeMultipart();
@@ -60,7 +63,7 @@ public class EmailUtils {
         }
     }
 
-    public static void sendEmailBulk (User[] users, String subject, String body, String link) {
+    public static void sendEmailBulk (List<User> users, String subject, String body, String link) {
         Thread thread = new Thread(() -> {
             for (User user: users) {
                 try {
