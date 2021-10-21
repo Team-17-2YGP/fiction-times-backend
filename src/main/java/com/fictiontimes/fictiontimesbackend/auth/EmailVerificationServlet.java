@@ -30,11 +30,11 @@ public class EmailVerificationServlet extends HttpServlet {
                         case WRITER_APPLICANT:
                             userService.activateUserProfile(user);
                             userService.sendNewWriterRegistrationRequestNotification(user);
-                            response.sendRedirect(CommonUtils.getFrontendAddress() + "/registration/activated");
+                            response.sendRedirect(CommonUtils.getFrontendAddress() + "/registration/activate");
                             break;
                         case READER:
                             userService.activateUserProfile(user);
-                            response.sendRedirect(CommonUtils.getFrontendAddress() + "/registration/activated");
+                            response.sendRedirect(CommonUtils.getFrontendAddress() + "/registration/activate");
                             break;
                         default:
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
