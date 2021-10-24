@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.utils;
 
 import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -10,10 +11,12 @@ import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class EmailUtils {
 
     private static Session session = null;
+    private static final Logger logger = Logger.getLogger(ReaderService.class.getName());
 
     private static Session getSession() throws IOException {
         if (session == null) {
@@ -51,8 +54,9 @@ public class EmailUtils {
                     + "<br /> <br />"
                     + "<a href=\"" + link + "\">Click here</a>"
                     + "<br /> <br />"
-                    + "Cheers <br/> Fiction times team"
+                    + "Cheers, <br/> Fiction times team"
                     ;
+            logger.info("Email: \n" + content);
             mimeBodyPart.setContent(content, "text/html");
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(mimeBodyPart);
