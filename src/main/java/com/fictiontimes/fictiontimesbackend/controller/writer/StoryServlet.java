@@ -32,9 +32,54 @@ import java.util.List;
 
 @WebServlet("/writer/story")
 @MultipartConfig
-public class PostStoryServlet extends HttpServlet {
+public class StoryServlet extends HttpServlet {
 
     private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
+        int userId;
+        try {
+            userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
+        } catch (TokenExpiredException | InvalidTokenException | TokenNotFoundException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
+            return;
+        }
+
+        String requestStoryId = request.getParameter("id");
+        if(requestStoryId != null && !requestStoryId.equals("")) {
+            int storyId = Integer.parseInt(requestStoryId);
+            try {
+                Story story = storyService.getStoryById(storyId, userId);
+                if(story == null){
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Invalid storyId or user is forbidden to access " +
+                            "resource\" }");
+                    return;
+                }
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(CommonUtils.getGson().toJson(story));
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
+            }
+        } else { // return all the stories created by the user
+            try {
+                List<Story> storyList = storyService.getStoryList(userId);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(CommonUtils.getGson().toJson(storyList));
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
+            }
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,

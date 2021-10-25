@@ -23,6 +23,23 @@ public class StoryService {
         return story;
     }
 
+    /** If a userId is passed, check if the story belong to that user (writer), if not return null*/
+    public Story getStoryById(int storyId, int userId) throws SQLException, IOException, ClassNotFoundException {
+        Story story = storyRepository.getStoryById(storyId);
+        if(story!=null && story.getUserId() == userId){
+            return story;
+        }
+        return null;
+    }
+    public Story getStoryById(int storyId) throws SQLException, IOException, ClassNotFoundException {
+        return storyRepository.getStoryById(storyId);
+    }
+
+    /** Get stories created by the user (writer) */
+    public List<Story> getStoryList(int userId) throws SQLException, IOException, ClassNotFoundException {
+        return storyRepository.getStoryListByUserId(userId);
+    }
+
     public Genre createNewGenre(Genre genre) throws SQLException, IOException, ClassNotFoundException {
         return genreRepository.createNewGenre(genre);
     }

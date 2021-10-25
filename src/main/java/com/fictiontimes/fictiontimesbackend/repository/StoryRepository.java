@@ -2,13 +2,17 @@ package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
+import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StoryRepository {
@@ -56,5 +60,84 @@ public class StoryRepository {
                 statement.executeBatch(); // Execute every 1000 items.
             }
         }
+    }
+
+    /** Get stories created by the writer */
+    public List<Story> getStoryListByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
+        List<Story> storyList = new ArrayList<>();
+        statement = DBConnection.getConnection().prepareStatement(
+                "SELECT * FROM story WHERE userId = ?"
+        );
+        statement.setInt(1, userId);
+
+        Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            int storyId = resultSet.getInt("storyId");
+            List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
+            List<Genre> genres = getStoryGenreList(storyId);
+            Story story = new Story(
+                    storyId,
+                    resultSet.getInt("userId"),
+                    resultSet.getString("title"),
+                    resultSet.getString("description"),
+                    resultSet.getInt("likeCount"),
+                    resultSet.getString("coverArtUrl"),
+                    null,
+                    StoryStatus.valueOf(resultSet.getString("status")),
+                    resultSet.getTimestamp("releasedDate"),
+                    tags,
+                    genres
+            );
+            storyList.add(story);
+        }
+        return storyList;
+    }
+
+    private List<Genre> getStoryGenreList(int storyId) throws SQLException, IOException, ClassNotFoundException {
+        List<Genre> genreList = new ArrayList<>();
+        statement = DBConnection.getConnection().prepareStatement(
+                "SELECT * FROM genre WHERE genreId IN " +
+                        "(SELECT genreId FROM story_genre WHERE storyId = ?)"
+        );
+        statement.setInt(1, storyId);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            Genre genre = new Genre(
+                    resultSet.getInt("genreId"),
+                    resultSet.getString("genreName")
+            );
+            genreList.add(genre);
+        }
+        return genreList;
+    }
+
+    public Story getStoryById(int storyId) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "SELECT * FROM story WHERE storyId = ?"
+        );
+        statement.setInt(1, storyId);
+        ResultSet resultSet = statement.executeQuery();
+
+        Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+        if (resultSet.next()) {
+            List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
+            List<Genre> genres = getStoryGenreList(storyId);
+            return new Story(
+                    storyId,
+                    resultSet.getInt("userId"),
+                    resultSet.getString("title"),
+                    resultSet.getString("description"),
+                    resultSet.getInt("likeCount"),
+                    resultSet.getString("coverArtUrl"),
+                    null,
+                    StoryStatus.valueOf(resultSet.getString("status")),
+                    resultSet.getTimestamp("releasedDate"),
+                    tags,
+                    genres
+            );
+        }
+        return null;
     }
 }
