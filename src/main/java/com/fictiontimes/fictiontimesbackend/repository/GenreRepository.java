@@ -43,4 +43,12 @@ public class GenreRepository {
         }
         return genre;
     }
+
+    public void deleteGenreById(int genreId) throws SQLException, IOException, ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "DELETE FROM genre WHERE (genreId) = ? "
+        );
+        statement.getUpdateCount();
+        statement.executeUpdate();
+    }
 }
