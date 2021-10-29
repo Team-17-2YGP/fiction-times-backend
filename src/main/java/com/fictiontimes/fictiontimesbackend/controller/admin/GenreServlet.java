@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet("/admin/genre")
-public class PostGenreServlet extends HttpServlet {
+public class GenreServlet extends HttpServlet {
 
     private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
 
@@ -46,4 +46,16 @@ public class PostGenreServlet extends HttpServlet {
         response.getWriter().write(payload);
     }
 
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String[] parameterValues = request.getParameterValues("id");
+        if (parameterValues != null) {
+            try {
+                storyService.deleteGenreById(Integer.parseInt(parameterValues[0]));
+                response.setStatus((HttpServletResponse.SC_OK));
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }

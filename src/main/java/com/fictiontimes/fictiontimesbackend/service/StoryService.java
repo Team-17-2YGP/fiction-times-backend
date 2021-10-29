@@ -47,4 +47,8 @@ public class StoryService {
     public List<Genre> getGenreList() throws SQLException, IOException, ClassNotFoundException {
         return genreRepository.getGenreList();
     }
+
+    public void deleteGenreById(int genreId) throws SQLException, IOException, ClassNotFoundException {
+        genreRepository.deleteGenreById(genreId);
+    }
 }
