@@ -5,6 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.Part;
@@ -27,7 +28,7 @@ public class FileUtils {
                 partFile.getInputStream(),
                 metadata
         );
-        getAWSClient().putObject(request);
+        getAWSClient().putObject(request.withCannedAcl(CannedAccessControlList.PublicRead));
         return "https://fiction-times-bucket.s3.ap-south-1.amazonaws.com/files/" + fileName;
     }
 
