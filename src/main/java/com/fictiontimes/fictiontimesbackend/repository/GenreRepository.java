@@ -48,7 +48,7 @@ public class GenreRepository {
         statement = DBConnection.getConnection().prepareStatement(
                 "DELETE FROM genre WHERE (genreId) = ? "
         );
-        statement.getUpdateCount();
+        statement.setInt(1, genreId);
         statement.executeUpdate();
     }
 }
