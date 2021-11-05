@@ -10,6 +10,7 @@ import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ReaderService {
@@ -32,5 +33,26 @@ public class ReaderService {
                 "To continue creating your new fiction times account please verify your email address.",
                 CommonUtils.getDomain() + "/user/activate?token=" + AuthUtils.generateVerificationToken(user)
         );
+    }
+
+    public List<User> getFollowingWritersList(int userId, int limit) throws SQLException, IOException,
+            ClassNotFoundException {
+        return readerRepository.getFollowingWritersList(userId, limit);
+    }
+
+    public void followWriter(int readerId, int writerId) throws SQLException, IOException, ClassNotFoundException {
+        readerRepository.followWriter(readerId, writerId);
+    }
+
+    public void unFollowWriter(int readerId, int writerId) throws SQLException, IOException, ClassNotFoundException {
+        readerRepository.unfollowWriter(readerId, writerId);
+    }
+
+    public boolean getNotificationStatus(int readerId, int writerId) throws SQLException, IOException,
+            ClassNotFoundException {
+        return readerRepository.getNotificationStatus(readerId, writerId);
+    }
+    public void setNotificationStatus(int readerId, int writerId, boolean notificationStatus) throws SQLException, IOException, ClassNotFoundException {
+        readerRepository.setNotificationStatus(readerId, writerId, notificationStatus);
     }
 }
