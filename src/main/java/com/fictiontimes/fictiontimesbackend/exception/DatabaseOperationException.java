@@ -2,8 +2,8 @@ package com.fictiontimes.fictiontimesbackend.exception;
 
 import jakarta.servlet.ServletException;
 
-public class InvalidTokenException extends ServletException{
-    public InvalidTokenException(String message) {
+public class DatabaseOperationException extends ServletException {
+    public DatabaseOperationException(String message) {
         super(message);
     }
 }

@@ -2,7 +2,6 @@ package com.fictiontimes.fictiontimesbackend.utils;
 
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.repository.DBConnection;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.util.Properties;

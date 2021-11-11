@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.controller.admin;
 
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet("/admin/genre")
 public class GenreServlet extends HttpServlet {
@@ -28,7 +28,7 @@ public class GenreServlet extends HttpServlet {
             genre = storyService.createNewGenre(genre);
             payload = CommonUtils.getGson().toJson(genre);
             response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
             String message = e.getMessage();
             String error;
@@ -46,16 +46,11 @@ public class GenreServlet extends HttpServlet {
         response.getWriter().write(payload);
     }
 
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseOperationException {
         String[] parameterValues = request.getParameterValues("id");
         if (parameterValues != null) {
-            try {
-                storyService.deleteGenreById(Integer.parseInt(parameterValues[0]));
-                response.setStatus((HttpServletResponse.SC_OK));
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
+            storyService.deleteGenreById(Integer.parseInt(parameterValues[0]));
+            response.setStatus((HttpServletResponse.SC_OK));
         }
     }
 }

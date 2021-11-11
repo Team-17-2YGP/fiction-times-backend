@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.exception;
 
-public class TokenNotFoundException extends Exception{
+import java.rmi.ServerException;
+
+public class TokenNotFoundException extends ServerException {
     public TokenNotFoundException(String errorMessage) {
         super(errorMessage);
     }

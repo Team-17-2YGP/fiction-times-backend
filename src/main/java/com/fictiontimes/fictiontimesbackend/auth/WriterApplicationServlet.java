@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.auth;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
@@ -16,8 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 
 @WebServlet("/user/writer/apply")
 @MultipartConfig
@@ -57,7 +56,7 @@ public class WriterApplicationServlet extends HttpServlet {
             applicant = userService.registerWriterApplicant(applicant);
             payload = CommonUtils.getGson().toJson(applicant);
             response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
             String message = e.getMessage();
             String error;

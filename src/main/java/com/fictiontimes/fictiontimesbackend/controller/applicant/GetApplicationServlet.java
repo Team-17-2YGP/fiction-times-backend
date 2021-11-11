@@ -2,7 +2,6 @@ package com.fictiontimes.fictiontimesbackend.controller.applicant;
 
 import com.fictiontimes.fictiontimesbackend.exception.InvalidTokenException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
-import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.ApplicantRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
@@ -22,20 +21,16 @@ public class GetApplicationServlet extends HttpServlet {
     private final ApplicantService applicantService = new ApplicantService(new ApplicantRepository(new UserRepository()));
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
-            WriterApplicant applicant = applicantService.getApplicantByUserId(userId);
-            response.setContentType("application/json");
-            if (applicant != null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write(CommonUtils.getGson().toJson(applicant));
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("{ error: \"Couldn't find an applicant with the given user id\"}");
-            }
-        } catch (TokenNotFoundException | InvalidTokenException | TokenExpiredException e) {
-            e.printStackTrace();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException {
+        int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
+        WriterApplicant applicant = applicantService.getApplicantByUserId(userId);
+        response.setContentType("application/json");
+        if (applicant != null) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(CommonUtils.getGson().toJson(applicant));
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{ error: \"Couldn't find an applicant with the given user id\"}");
         }
     }
 }
