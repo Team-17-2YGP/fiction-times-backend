@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
+import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
 
@@ -66,6 +67,18 @@ public class ReaderRepository {
         statement.setInt(2, writerId);
 
         statement.executeUpdate();
+    }
+
+    public boolean getFollowingStatus(int readerId, int writerId) throws SQLException, IOException,
+            ClassNotFoundException {
+        statement = DBConnection.getConnection().prepareStatement(
+                "SELECT writerId FROM reader_following WHERE readerId=? AND writerId=?"
+        );
+        statement.setInt(1, readerId);
+        statement.setInt(2, writerId);
+
+        ResultSet resultSet = statement.executeQuery();
+        return resultSet.next();
     }
 
     public boolean getNotificationStatus(int readerId, int writerId) throws SQLException, IOException, ClassNotFoundException {

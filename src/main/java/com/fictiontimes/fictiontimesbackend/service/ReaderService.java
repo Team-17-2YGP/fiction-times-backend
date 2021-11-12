@@ -1,9 +1,12 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
@@ -16,11 +19,13 @@ import java.util.logging.Logger;
 public class ReaderService {
     private UserRepository userRepository;
     private ReaderRepository readerRepository;
+    private WriterRepository writerRepository;
     private final Logger logger = Logger.getLogger(ReaderService.class.getName());
 
-    public ReaderService(UserRepository userRepository, ReaderRepository readerRepository) {
+    public ReaderService(UserRepository userRepository, ReaderRepository readerRepository, WriterRepository writerRepository) {
         this.userRepository = userRepository;
         this.readerRepository = readerRepository;
+        this.writerRepository = writerRepository;
     }
 
     public void verifyReaderSubscription(PayhereNotifyDTO payhereNotifyDTO) throws SQLException, IOException, ClassNotFoundException {
@@ -48,10 +53,24 @@ public class ReaderService {
         readerRepository.unfollowWriter(readerId, writerId);
     }
 
-    public boolean getNotificationStatus(int readerId, int writerId) throws SQLException, IOException,
+    public WriterDetailsDTO getWriterDetails(int readerId, int writerId) throws SQLException, IOException,
             ClassNotFoundException {
-        return readerRepository.getNotificationStatus(readerId, writerId);
+        WriterDetailsDTO writerDetails = new WriterDetailsDTO();
+
+        Writer writer = writerRepository.findWriterById(writerId);
+
+        writerDetails.setUserId(writer.getUserId());
+        writerDetails.setFirstName(writer.getFirstName());
+        writerDetails.setLastName(writer.getLastName());
+        writerDetails.setProfilePictureUrl(writer.getProfilePictureUrl());
+        writerDetails.setBio(writer.getBio());
+        writerDetails.setSubscribedNotifications(readerRepository.getNotificationStatus(readerId, writerId));
+        writerDetails.setFollowing(readerRepository.getFollowingStatus(readerId, writerId));
+        writerDetails.setFollowerCount(writerRepository.getFollowerCountById(writerId));
+        writerDetails.setStoryCount(writerRepository.getStoryCountById(writerId));
+        return writerDetails;
     }
+
     public void setNotificationStatus(int readerId, int writerId, boolean notificationStatus) throws SQLException, IOException, ClassNotFoundException {
         readerRepository.setNotificationStatus(readerId, writerId, notificationStatus);
     }

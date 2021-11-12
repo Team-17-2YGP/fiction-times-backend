@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,7 +19,8 @@ import java.sql.SQLException;
 @WebServlet(urlPatterns = {"/reader/follow", "/reader/unfollow"})
 public class FollowWriterServlet extends HttpServlet {
 
-    ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository());
+    ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(),
+            new WriterRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
