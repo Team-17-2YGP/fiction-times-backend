@@ -4,6 +4,7 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayhereMessageType;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 import com.fictiontimes.fictiontimesbackend.utils.PayhereUtils;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -22,7 +23,7 @@ import java.util.Date;
 @MultipartConfig
 public class PayhereNotifyServlet extends HttpServlet {
 
-    ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository());
+    ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(), new WriterRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
