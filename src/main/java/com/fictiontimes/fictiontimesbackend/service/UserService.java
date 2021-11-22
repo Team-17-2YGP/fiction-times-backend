@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereFormDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
@@ -12,8 +13,6 @@ import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,13 +24,13 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createNewUser(User user) throws NoSuchAlgorithmException, SQLException, IOException, ClassNotFoundException {
+    public User createNewUser(User user) throws DatabaseOperationException {
         user.setProfilePictureUrl("https://ui-avatars.com/api/?name=" + user.getFirstName() + "+" + user.getLastName());
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return userRepository.createNewUser(user);
     }
 
-    public User checkCredentials(User user) throws SQLException, IOException, ClassNotFoundException {
+    public User checkCredentials(User user) throws DatabaseOperationException {
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         User matchedUser = userRepository.findUserByUserName(user.getUserName());
         if (matchedUser != null && matchedUser.getPassword().equals(user.getPassword())) {
@@ -40,7 +39,7 @@ public class UserService {
         return null;
     }
 
-    public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+    public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws DatabaseOperationException, IOException {
         applicant.setRequestedAt(new Date());
         applicant.setResponse("");
         applicant.setRespondedAt(null);
@@ -55,7 +54,7 @@ public class UserService {
         return applicant;
     }
 
-    public PayhereFormDTO registerReader(Reader reader) throws SQLException, IOException, ClassNotFoundException {
+    public PayhereFormDTO registerReader(Reader reader) throws DatabaseOperationException, IOException {
         reader.setSubscriptionStatus(SubscriptionStatus.PENDING);
         reader = userRepository.registerReader(reader);
         return new PayhereFormDTO(
@@ -64,7 +63,7 @@ public class UserService {
         );
     }
 
-    public User getUserByUserId(int userId) throws SQLException, IOException, ClassNotFoundException {
+    public User getUserByUserId(int userId) throws DatabaseOperationException {
         return userRepository.findUserByUserId(userId);
     }
 
@@ -83,7 +82,7 @@ public class UserService {
     public void activateUserProfile(User user) {
         try {
             userRepository.activateUserProfile(user);
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
         }
     }

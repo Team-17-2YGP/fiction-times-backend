@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.auth;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
@@ -13,8 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 
 @WebServlet("/user/reader/registration")
 public class ReaderRegistrationServlet extends HttpServlet {
@@ -31,7 +30,7 @@ public class ReaderRegistrationServlet extends HttpServlet {
             reader.setUserId(userService.createNewUser(reader).getUserId());
             payload = CommonUtils.getGson().toJson(userService.registerReader(reader));
             response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (NoSuchAlgorithmException | SQLException | ClassNotFoundException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
             String message = e.getMessage();
             String error;

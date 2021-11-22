@@ -1,10 +1,9 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.ApplicantRepository;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 
 public class ApplicantService {
@@ -18,13 +17,13 @@ public class ApplicantService {
     public WriterApplicant getApplicantByUserId(int userId) {
         try {
             return applicantRepository.getWriterApplicantById(userId);
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public boolean requestReview(WriterApplicant applicant) throws SQLException, IOException, ClassNotFoundException {
+    public boolean requestReview(WriterApplicant applicant) throws DatabaseOperationException {
         if (new Date().after(new Date(applicant.getRequestedAt().getTime() + 259200000))) {
             // TODO: Send out a notification email to the admins
             applicantRepository.updateRequestedAt(applicant);

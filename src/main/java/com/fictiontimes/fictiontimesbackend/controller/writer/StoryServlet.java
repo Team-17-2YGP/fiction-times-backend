@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.controller.writer;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.InvalidTokenException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
@@ -24,7 +25,6 @@ import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,53 +37,32 @@ public class StoryServlet extends HttpServlet {
     private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
         response.setContentType("application/json");
 
-        int userId;
-        try {
-            userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
-        } catch (TokenExpiredException | InvalidTokenException | TokenNotFoundException e) {
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
-            return;
-        }
-
+        int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         String requestStoryId = request.getParameter("id");
-        if(requestStoryId != null && !requestStoryId.equals("")) {
+        if (requestStoryId != null && !requestStoryId.equals("")) {
             int storyId = Integer.parseInt(requestStoryId);
-            try {
-                Story story = storyService.getStoryById(storyId, userId);
-                if(story == null){
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Invalid storyId or user is forbidden to access " +
-                            "resource\" }");
-                    return;
-                }
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write(CommonUtils.getGson().toJson(story));
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
+            Story story = storyService.getStoryById(storyId, userId);
+            if (story == null) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("{\"error\": \"Invalid storyId or user is forbidden to access " +
+                        "resource\" }");
+                return;
             }
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(CommonUtils.getGson().toJson(story));
         } else { // return all the stories created by the user
-            try {
-                List<Story> storyList = storyService.getStoryList(userId);
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write(CommonUtils.getGson().toJson(storyList));
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
-            }
+            List<Story> storyList = storyService.getStoryList(userId);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(CommonUtils.getGson().toJson(storyList));
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
+            IOException, TokenNotFoundException, InvalidTokenException, TokenExpiredException, ServletException {
         String payload;
         Story story = null;
         Gson gson = CommonUtils.getGson();
@@ -96,13 +75,15 @@ public class StoryServlet extends HttpServlet {
             Timestamp releasedDate = new Timestamp(new Date().getTime());
             Part coverArt = request.getPart("coverArt");
 
-            Type genreListType = new TypeToken<ArrayList<Genre>>(){}.getType();
+            Type genreListType = new TypeToken<ArrayList<Genre>>() {
+            }.getType();
             List<Genre> genreArray = gson.fromJson(request.getParameter("genres"), genreListType);
 
-            Type tagListType = new TypeToken<ArrayList<String>>(){}.getType();
+            Type tagListType = new TypeToken<ArrayList<String>>() {
+            }.getType();
             List<String> tagArray = gson.fromJson(request.getParameter("tags"), tagListType);
 
-            story = new Story(0,userId,title, description, 0, "", coverArt,
+            story = new Story(0, userId, title, description, 0, "", coverArt,
                     status, releasedDate, tagArray, genreArray);
 
             story = storyService.createNewStory(story);
@@ -110,7 +91,7 @@ public class StoryServlet extends HttpServlet {
             payload = CommonUtils.getGson().toJson(story);
             response.setStatus(HttpServletResponse.SC_CREATED);
 
-        } catch (SQLException | ClassNotFoundException | TokenNotFoundException | InvalidTokenException | TokenExpiredException e) {
+        } catch (DatabaseOperationException e) {
             e.printStackTrace();
             String message = e.getMessage();
             String error;

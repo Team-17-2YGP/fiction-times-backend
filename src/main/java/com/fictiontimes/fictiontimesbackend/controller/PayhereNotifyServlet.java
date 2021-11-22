@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.controller;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayhereMessageType;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
@@ -14,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,7 +26,7 @@ public class PayhereNotifyServlet extends HttpServlet {
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(), new WriterRepository());
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseOperationException {
         String merchant_id = request.getParameter("merchant_id");
         String order_id = request.getParameter("order_id");
         String payment_id = request.getParameter("payment_id");
@@ -58,11 +58,7 @@ public class PayhereNotifyServlet extends HttpServlet {
         if (PayhereUtils.verifyMD5Sig(notification)) {
             switch (notification.getMessage_type()) {
                 case AUTHORIZATION_SUCCESS:
-                    try {
                         readerService.verifyReaderSubscription(notification);
-                    } catch (SQLException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case AUTHORIZATION_FAILED:
                     break;

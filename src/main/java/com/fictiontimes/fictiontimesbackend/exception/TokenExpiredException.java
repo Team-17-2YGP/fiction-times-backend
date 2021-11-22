@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.exception;
 
-public class TokenExpiredException extends Exception{
+import jakarta.servlet.ServletException;
+
+public class TokenExpiredException extends ServletException {
     public TokenExpiredException(String errorMessage) {
         super(errorMessage);
     }

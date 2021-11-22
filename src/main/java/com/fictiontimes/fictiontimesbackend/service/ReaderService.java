@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
+import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.User;
@@ -12,7 +13,6 @@ import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +28,7 @@ public class ReaderService {
         this.writerRepository = writerRepository;
     }
 
-    public void verifyReaderSubscription(PayhereNotifyDTO payhereNotifyDTO) throws SQLException, IOException, ClassNotFoundException {
+    public void verifyReaderSubscription(PayhereNotifyDTO payhereNotifyDTO) throws DatabaseOperationException, IOException {
         User user = userRepository.findUserByEmail(payhereNotifyDTO.getCustom_1());
         readerRepository.verifyReaderSubscription(user.getUserId());
         logger.info("Sending the email");
@@ -40,21 +40,19 @@ public class ReaderService {
         );
     }
 
-    public List<User> getFollowingWritersList(int userId, int limit) throws SQLException, IOException,
-            ClassNotFoundException {
+    public List<User> getFollowingWritersList(int userId, int limit) throws DatabaseOperationException {
         return readerRepository.getFollowingWritersList(userId, limit);
     }
 
-    public void followWriter(int readerId, int writerId) throws SQLException, IOException, ClassNotFoundException {
+    public void followWriter(int readerId, int writerId) throws DatabaseOperationException {
         readerRepository.followWriter(readerId, writerId);
     }
 
-    public void unFollowWriter(int readerId, int writerId) throws SQLException, IOException, ClassNotFoundException {
+    public void unFollowWriter(int readerId, int writerId) throws DatabaseOperationException {
         readerRepository.unfollowWriter(readerId, writerId);
     }
 
-    public WriterDetailsDTO getWriterDetails(int readerId, int writerId) throws SQLException, IOException,
-            ClassNotFoundException {
+    public WriterDetailsDTO getWriterDetails(int readerId, int writerId) throws DatabaseOperationException {
         WriterDetailsDTO writerDetails = new WriterDetailsDTO();
 
         Writer writer = writerRepository.findWriterById(writerId);
@@ -71,7 +69,7 @@ public class ReaderService {
         return writerDetails;
     }
 
-    public void setNotificationStatus(int readerId, int writerId, boolean notificationStatus) throws SQLException, IOException, ClassNotFoundException {
+    public void setNotificationStatus(int readerId, int writerId, boolean notificationStatus) throws DatabaseOperationException {
         readerRepository.setNotificationStatus(readerId, writerId, notificationStatus);
     }
 }
