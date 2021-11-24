@@ -22,12 +22,10 @@ public class SubscribeNotificationsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
-        response.setContentType("application/json");
         int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         String reqWriterId = request.getParameter("id");
         int writerId = Integer.parseInt(reqWriterId);
         boolean subscribe = !request.getRequestURI().endsWith("unsubscribeNotifications");
         readerService.setNotificationStatus(readerId, writerId, subscribe);
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

@@ -42,7 +42,6 @@ public class UserRegistrationServlet extends HttpServlet {
             ErrorDTO<User> errorDTO = new ErrorDTO<>(error, user);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
-        response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_CREATED);
         response.getWriter().write(payload);
     }

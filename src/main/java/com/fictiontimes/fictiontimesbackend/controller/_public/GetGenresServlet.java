@@ -18,8 +18,6 @@ public class GetGenresServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseOperationException {
-        response.setContentType("application/json");
         response.getWriter().write(CommonUtils.getGson().toJson(storyService.getGenreList()));
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

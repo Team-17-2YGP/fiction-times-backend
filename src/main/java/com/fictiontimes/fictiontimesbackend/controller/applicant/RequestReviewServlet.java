@@ -28,7 +28,6 @@ public class RequestReviewServlet extends HttpServlet {
         if (hasRequested) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
-            response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{ error: \"Last requested date is within 3 days\"}");
         }

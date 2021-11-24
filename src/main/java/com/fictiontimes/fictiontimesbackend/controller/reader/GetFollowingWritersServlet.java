@@ -25,15 +25,12 @@ public class GetFollowingWritersServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
-        response.setContentType("application/json");
-
         int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
 
         String reqLimit = request.getParameter("limit");
         int limit = (reqLimit == null) ? 20 : Integer.parseInt(reqLimit);
 
         List<User> followingWriterList = readerService.getFollowingWritersList(userId, limit);
-        response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(CommonUtils.getGson().toJson(followingWriterList));
     }
 }

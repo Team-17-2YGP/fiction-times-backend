@@ -25,13 +25,9 @@ public class GetApplicantsServlet extends HttpServlet {
             if (applicant == null) {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType("application/json");
                 response.getWriter().write(CommonUtils.getGson().toJson(applicant));
             }
         } else {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
             response.getWriter().write(CommonUtils.getGson().toJson(adminService.getApplicantList()));
         }
     }

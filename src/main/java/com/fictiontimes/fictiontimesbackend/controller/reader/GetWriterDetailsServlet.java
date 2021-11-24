@@ -24,14 +24,11 @@ public class GetWriterDetailsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
-        response.setContentType("application/json");
-
         int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         String reqWriterId = request.getParameter("id");
         int writerId = Integer.parseInt(reqWriterId);
 
         WriterDetailsDTO writerDetails = readerService.getWriterDetails(readerId, writerId);
-        response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(CommonUtils.getGson().toJson(writerDetails));
     }
 }

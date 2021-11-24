@@ -24,9 +24,7 @@ public class GetApplicationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException {
         int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         WriterApplicant applicant = applicantService.getApplicantByUserId(userId);
-        response.setContentType("application/json");
         if (applicant != null) {
-            response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(CommonUtils.getGson().toJson(applicant));
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

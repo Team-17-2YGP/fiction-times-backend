@@ -47,7 +47,6 @@ public class ReaderRegistrationServlet extends HttpServlet {
             ErrorDTO<Reader> errorDTO = new ErrorDTO<>(error, reader);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
-        response.setContentType("application/json");
         response.getWriter().write(payload);
     }
 }
