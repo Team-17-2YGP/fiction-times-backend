@@ -42,6 +42,11 @@ public class AuthUtils {
     }
 
     public static int getUserId(String token) throws TokenExpiredException, InvalidTokenException {
+        return getAuthToken(token).getUserId();
+    }
+
+    public static TokenBody getAuthToken(String token) throws InvalidTokenException,
+            TokenExpiredException {
         String[] destructuredToken = token.split("\\.");
         if (!DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
             throw new InvalidTokenException("Token not valid");
@@ -51,7 +56,7 @@ public class AuthUtils {
         if (tokenBody.getExpDate().before(new Date())) {
             throw new TokenExpiredException("Auth token expired");
         }
-        return tokenBody.getUserId();
+        return tokenBody;
     }
 
     public static String extractAuthToken(HttpServletRequest request) throws TokenNotFoundException {
