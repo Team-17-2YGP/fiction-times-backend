@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
@@ -10,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -161,6 +163,25 @@ public class StoryRepository {
                 );
             }
             return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void saveEpisode(Episode episode) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO episode(storyId, episodeNumber, title, description, readCount, uploadedAt, content) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, episode.getStoryId());
+            statement.setInt(2, episode.getEpisodeNumber());
+            statement.setString(3, episode.getTitle());
+            statement.setString(4, episode.getDescription());
+            statement.setInt(5, episode.getReadCount());
+            statement.setDate(6, new Date(episode.getUploadedAt().getTime()));
+            statement.setString(7, episode.getContent());
+            statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

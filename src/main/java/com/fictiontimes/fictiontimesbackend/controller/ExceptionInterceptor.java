@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.controller;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.InvalidTokenException;
+import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.exception.TokenNotFoundException;
 import jakarta.servlet.*;
@@ -35,6 +36,10 @@ public class ExceptionInterceptor implements Filter {
             e.printStackTrace();
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
+        } catch (NoSuchObjectFoundException e) {
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");
         }
     }

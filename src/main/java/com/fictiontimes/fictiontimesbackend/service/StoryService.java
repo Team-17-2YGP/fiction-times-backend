@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
+import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
@@ -49,5 +51,13 @@ public class StoryService {
 
     public void deleteGenreById(int genreId) throws DatabaseOperationException {
         genreRepository.deleteGenreById(genreId);
+    }
+
+    public void saveEpisode(Episode episode, int userId) throws DatabaseOperationException, NoSuchObjectFoundException {
+        Story story = getStoryById(episode.getStoryId(), userId);
+        if (story == null) {
+            throw new NoSuchObjectFoundException("Story object by the received story id doesn't exist");
+        }
+        storyRepository.saveEpisode(episode);
     }
 }
