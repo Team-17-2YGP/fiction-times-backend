@@ -25,8 +25,6 @@ public class GetUserServlet extends HttpServlet {
         String token = AuthUtils.extractAuthToken(request);
         int userId = AuthUtils.getUserId(token);
         User user = userService.getUserByUserId(userId);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
         response.getWriter().write(CommonUtils.getGson().toJson(user));
     }
 }

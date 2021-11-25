@@ -73,7 +73,6 @@ public class WriterApplicationServlet extends HttpServlet {
             ErrorDTO<WriterApplicant> errorDTO = new ErrorDTO<>(error, applicant);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
-        response.setContentType("application/json");
         response.getWriter().write(payload);
     }
 }

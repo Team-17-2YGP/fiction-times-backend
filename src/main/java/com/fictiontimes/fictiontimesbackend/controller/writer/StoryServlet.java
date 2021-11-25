@@ -38,8 +38,6 @@ public class StoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
-        response.setContentType("application/json");
-
         int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         String requestStoryId = request.getParameter("id");
         if (requestStoryId != null && !requestStoryId.equals("")) {
@@ -51,11 +49,9 @@ public class StoryServlet extends HttpServlet {
                         "resource\" }");
                 return;
             }
-            response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(CommonUtils.getGson().toJson(story));
         } else { // return all the stories created by the user
             List<Story> storyList = storyService.getStoryList(userId);
-            response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(CommonUtils.getGson().toJson(storyList));
         }
     }
@@ -105,7 +101,6 @@ public class StoryServlet extends HttpServlet {
             ErrorDTO<Story> errorDTO = new ErrorDTO<>(error, story);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
-        response.setContentType("application/json");
         response.getWriter().write(payload);
     }
 }

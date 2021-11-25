@@ -42,7 +42,6 @@ public class GenreServlet extends HttpServlet {
             ErrorDTO<Genre> errorDTO = new ErrorDTO<>(error, genre);
             payload = CommonUtils.getGson().toJson(errorDTO);
         }
-        response.setContentType("application/json");
         response.getWriter().write(payload);
     }
 
