@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
@@ -26,6 +27,10 @@ public class ReaderService {
         this.userRepository = userRepository;
         this.readerRepository = readerRepository;
         this.writerRepository = writerRepository;
+    }
+
+    public Reader getReaderById(int readerId) throws DatabaseOperationException {
+        return readerRepository.findReaderById(readerId);
     }
 
     public void verifyReaderSubscription(PayhereNotifyDTO payhereNotifyDTO) throws DatabaseOperationException, IOException {

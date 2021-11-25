@@ -1,7 +1,10 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 
 import java.io.IOException;
@@ -14,6 +17,38 @@ import java.util.List;
 public class ReaderRepository {
 
     private PreparedStatement statement;
+
+    public Reader findReaderById(int readerId) throws DatabaseOperationException {
+        try {
+            Reader reader = new Reader();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader r ON u.userId=r.userId WHERE u.userId=?"
+            );
+            statement.setInt(1, readerId);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                reader.setUserId(resultSet.getInt("userId"));
+                reader.setUserName(resultSet.getString("userName"));
+                reader.setFirstName(resultSet.getString("firstName"));
+                reader.setLastName(resultSet.getString("lastName"));
+                reader.setEmail(resultSet.getString("email"));
+                reader.setAddressLane1(resultSet.getString("addressLane1"));
+                reader.setAddressLane2(resultSet.getString("addressLane2"));
+                reader.setCity(resultSet.getString("city"));
+                reader.setCountry(resultSet.getString("country"));
+                reader.setPhoneNumber(resultSet.getString("phoneNumber"));
+                reader.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                reader.setUserType(UserType.valueOf(resultSet.getString("userType")));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString("userStatus")));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString("subscriptionStatus")));
+                return reader;
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 
     public void verifyReaderSubscription(int userId) throws DatabaseOperationException {
         try {
