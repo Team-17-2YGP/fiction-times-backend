@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereFormDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.UserPasswordDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
@@ -85,5 +86,16 @@ public class UserService {
         } catch (DatabaseOperationException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean updatePassword(int userId, UserPasswordDTO userPasswordDTO) throws DatabaseOperationException {
+        User matchedUser = getUserByUserId(userId);
+        String oldPasswordHash = DigestUtils.md5Hex(userPasswordDTO.getOldPassword());
+        if(oldPasswordHash.equals(matchedUser.getPassword())){
+            String newPasswordHash = DigestUtils.md5Hex(userPasswordDTO.getNewPassword());
+            userRepository.updatePassword(userId, newPasswordHash);
+            return true;
+        }
+        return false;
     }
 }
