@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 
@@ -40,5 +41,9 @@ public class AdminService{
         // TODO: Send the rejection email
         adminRepository.deleteApplicant(applicant);
         adminRepository.deleteUser(applicant);
+    }
+
+    public void blockUserByUserId(int userId) throws DatabaseOperationException {
+        adminRepository.blockUserByUserId(userId);
     }
 }
