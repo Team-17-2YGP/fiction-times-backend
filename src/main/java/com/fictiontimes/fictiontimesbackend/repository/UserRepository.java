@@ -222,4 +222,17 @@ public class UserRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void updatePassword(int userId, String password) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE user SET password = ? WHERE userId = ?"
+            );
+            statement.setString(1, password);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
