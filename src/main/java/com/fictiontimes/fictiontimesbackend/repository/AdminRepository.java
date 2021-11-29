@@ -1,10 +1,14 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -137,6 +141,61 @@ public class AdminRepository {
             );
             statement.setInt(1, applicant.getUserId());
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void blockUserByUserId(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE user SET userStatus = ? WHERE userId = ?"
+            );
+            statement.setString(1, UserStatus.BANNED.toString());
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Writer> getWritersList(int limit) throws DatabaseOperationException {
+        try {
+            List<Writer> writerList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN writer w on u.userId = w.userId " +
+                            "WHERE u.userType = ? ORDER BY u.userId DESC " +
+                            "LIMIT ?"
+            );
+            statement.setString(1, UserType.WRITER.toString());
+            statement.setInt(2, limit);
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Writer writer = new Writer();
+                writer.setUserId(resultSet.getInt(1));
+                writer.setUserName(resultSet.getString(2));
+                writer.setFirstName(resultSet.getString(3));
+                writer.setLastName(resultSet.getString(4));
+                writer.setEmail(resultSet.getString(6));
+                writer.setAddressLane1(resultSet.getString(7));
+                writer.setAddressLane2(resultSet.getString(8));
+                writer.setCity(resultSet.getString(9));
+                writer.setCountry(resultSet.getString(10));
+                writer.setPhoneNumber(resultSet.getString(11));
+                writer.setProfilePictureUrl(resultSet.getString(12));
+                writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                writer.setBusinessAddressLane1(resultSet.getString(16));
+                writer.setBusinessAddressLane2(resultSet.getString(17));
+                writer.setBusinessCity(resultSet.getString(18));
+                writer.setBusinessCountry(resultSet.getString(19));
+                writer.setLandline(resultSet.getString(20));
+                writer.setCurrentBalance(resultSet.getDouble(21));
+                writer.setBio(resultSet.getString(22));
+                writerList.add(writer);
+            }
+            return writerList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
