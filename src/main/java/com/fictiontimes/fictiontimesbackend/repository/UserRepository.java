@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserRepository {
 
@@ -230,6 +231,35 @@ public class UserRepository {
             );
             statement.setString(1, password);
             statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void updateUserDetails(User user) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE user " +
+                            "SET userName = ?," +
+                            "    firstName = ?," +
+                            "    lastName = ?," +
+                            "    addressLane1 = ?," +
+                            "    addressLane2 = ?," +
+                            "    city = ?," +
+                            "    country = ?," +
+                            "    phoneNumber = ?" +
+                            "WHERE userId = ?"
+            );
+            statement.setString(1, Objects.requireNonNull(user.getUserName()));
+            statement.setString(2, Objects.requireNonNull(user.getFirstName()));
+            statement.setString(3, Objects.requireNonNull(user.getLastName()));
+            statement.setString(4, Objects.requireNonNull(user.getAddressLane1()));
+            statement.setString(5, Objects.requireNonNull(user.getAddressLane2()));
+            statement.setString(6, Objects.requireNonNull(user.getCity()));
+            statement.setString(7, Objects.requireNonNull(user.getCountry()));
+            statement.setString(8, Objects.requireNonNull(user.getPhoneNumber()));
+            statement.setInt(9, user.getUserId());
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());

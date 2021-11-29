@@ -32,7 +32,7 @@ public class GetUserServlet extends HttpServlet {
     UserService userService = new UserService(new UserRepository());
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(),
             new WriterRepository());
-    WriterService writerService = new WriterService(new WriterRepository());
+    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
     ApplicantService applicantService = new ApplicantService(new ApplicantRepository(new UserRepository()));
 
     @Override
