@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class WriterRepository {
 
@@ -82,6 +83,31 @@ public class WriterRepository {
                 return resultSet.getInt("COUNT(storyId)");
             }
             return 0;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void updateWriterDetails(Writer writer) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE writer " +
+                            "SET addressLane1 = ?," +
+                            "    addressLane2 = ?," +
+                            "    city = ?," +
+                            "    country = ?," +
+                            "    landline = ?," +
+                            "    bio = ?" +
+                            "WHERE userId = ?"
+            );
+            statement.setString(1, Objects.requireNonNull(writer.getBusinessAddressLane2()));
+            statement.setString(2, Objects.requireNonNull(writer.getBusinessAddressLane2()));
+            statement.setString(3, Objects.requireNonNull(writer.getBusinessCity()));
+            statement.setString(4, Objects.requireNonNull(writer.getBusinessCountry()));
+            statement.setString(5, Objects.requireNonNull(writer.getLandline()));
+            statement.setString(6, Objects.requireNonNull(writer.getBio()));
+            statement.setInt(7, writer.getUserId());
+            statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

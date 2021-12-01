@@ -16,12 +16,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/user/updatePassword")
+@WebServlet("/user/update/password")
 public class UpdatePasswordServlet extends HttpServlet {
     private final UserService userService = new UserService(new UserRepository());
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ServletException {
         UserPasswordDTO userPasswordDTO = CommonUtils.getGson().fromJson(request.getReader(), UserPasswordDTO.class);
         int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         if(!userService.updatePassword(userId, userPasswordDTO)){

@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class ReaderService {
+    private final Logger logger = Logger.getLogger(ReaderService.class.getName());
     private UserRepository userRepository;
     private ReaderRepository readerRepository;
     private WriterRepository writerRepository;
-    private final Logger logger = Logger.getLogger(ReaderService.class.getName());
 
     public ReaderService(UserRepository userRepository, ReaderRepository readerRepository, WriterRepository writerRepository) {
         this.userRepository = userRepository;
@@ -76,5 +76,9 @@ public class ReaderService {
 
     public void setNotificationStatus(int readerId, int writerId, boolean notificationStatus) throws DatabaseOperationException {
         readerRepository.setNotificationStatus(readerId, writerId, notificationStatus);
+    }
+
+    public void updateReaderProfileDetails(Reader readerDetails) throws DatabaseOperationException {
+        userRepository.updateUserDetails(readerDetails);
     }
 }
