@@ -11,6 +11,8 @@ import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
+import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
+import jakarta.servlet.http.Part;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
@@ -97,5 +99,13 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public void updateProfilePicture(int userId, Part profilePictureFile) throws DatabaseOperationException, IOException {
+        User matchedUser = userRepository.findUserByUserId(userId);
+        if(matchedUser.getProfilePictureUrl().startsWith("https://fiction-times-bucket.s3.ap-south-1.amazonaws.com/")){
+            FileUtils.deleteFile(matchedUser.getProfilePictureUrl());
+        }
+        userRepository.updateProfilePicture(userId, profilePictureFile);
     }
 }

@@ -7,6 +7,7 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -114,23 +115,39 @@ public class UserRepository {
     public WriterApplicant registerWriterApplicant(WriterApplicant applicant) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
-                    "INSERT INTO writerApplicant (userId, response, respondedAt, requestedAt, previousWork, " +
+                    "INSERT INTO writerApplicant (userId, response, respondedAt, requestedAt, " +
                             "socialMediaUrls, landline, addressLane1, addressLane2, city, country)" +
-                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             statement.setInt(1, applicant.getUserId());
             statement.setString(2, applicant.getResponse());
             statement.setDate(3, null);
             statement.setDate(4, new Date(applicant.getRequestedAt().getTime()));
-            statement.setString(5, FileUtils.saveFile(applicant.getPreviousWork()));
-            statement.setString(6, applicant.getSocialMediaUrls());
-            statement.setString(7, applicant.getLandline());
-            statement.setString(8, applicant.getBusinessAddressLane1());
-            statement.setString(9, applicant.getBusinessAddressLane2());
-            statement.setString(10, applicant.getBusinessAddressCity());
-            statement.setString(11, applicant.getBusinessAddressCountry());
+            statement.setString(5, applicant.getSocialMediaUrls());
+            statement.setString(6, applicant.getLandline());
+            statement.setString(7, applicant.getBusinessAddressLane1());
+            statement.setString(8, applicant.getBusinessAddressLane2());
+            statement.setString(9, applicant.getBusinessAddressCity());
+            statement.setString(10, applicant.getBusinessAddressCountry());
             statement.execute();
+            applicant.setPreviousWorkUrl(updateApplicantPreviousWork(applicant.getUserId(), applicant.getPreviousWork()));
             return applicant;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public String updateApplicantPreviousWork(int userId, Part previousWorkFile) throws DatabaseOperationException {
+        try {
+            String previousWorkUrl = FileUtils.saveFile(previousWorkFile,
+                    "applicantPreviousWork/previous-work-" + userId);
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE writerApplicant SET previousWork=? WHERE userId=?"
+            );
+            statement.setString(1, previousWorkUrl);
+            statement.setInt(2, userId);
+            statement.execute();
+            return previousWorkUrl;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
@@ -230,6 +247,21 @@ public class UserRepository {
                     "UPDATE user SET password = ? WHERE userId = ?"
             );
             statement.setString(1, password);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void updateProfilePicture(int userId, Part profilePictureFile) throws DatabaseOperationException {
+        try {
+            String profilePictureUrl = FileUtils.saveFile(profilePictureFile,
+                    "profilePicture/profile-picture-" + userId);
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE user SET profilePictureUrl = ? WHERE userId = ?"
+            );
+            statement.setString(1, profilePictureUrl);
             statement.setInt(2, userId);
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {

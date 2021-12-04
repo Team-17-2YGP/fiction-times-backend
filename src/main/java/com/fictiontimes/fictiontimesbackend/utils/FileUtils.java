@@ -10,11 +10,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.Part;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
@@ -28,19 +24,24 @@ public class FileUtils {
 
     private static AmazonS3 s3Client = null;
 
-    public static String saveFile(Part partFile) throws IOException {
-        String fileName = partFile.getSubmittedFileName().replaceAll(" ", "-");
+    public static String saveFile(Part partFile, String path) throws IOException {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(partFile.getSize());
         metadata.setContentType(partFile.getContentType());
+        String fileName = partFile.getSubmittedFileName().replaceAll(" ", "-");
         PutObjectRequest request = new PutObjectRequest(
                 "fiction-times-bucket",
-                "files/" + fileName,
+                path + "-" + fileName,
                 partFile.getInputStream(),
                 metadata
         );
         getAWSClient().putObject(request.withCannedAcl(CannedAccessControlList.PublicRead));
-        return "https://fiction-times-bucket.s3.ap-south-1.amazonaws.com/files/" + fileName;
+        return "https://fiction-times-bucket.s3.ap-south-1.amazonaws.com/" + path + "-" + fileName;
+    }
+
+    public static void deleteFile(String fileUrl) throws IOException {
+        String key = fileUrl.replace("https://fiction-times-bucket.s3.ap-south-1.amazonaws.com/", "");
+        getAWSClient().deleteObject("fiction-times-bucket", key);
     }
 
     public static String saveEpub(Part partFile, int storyId, int episodeNumber) throws IOException {
@@ -60,7 +61,7 @@ public class FileUtils {
                 if (name.endsWith(".xhtml") && !name.endsWith("nav.xhtml")) {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epub.getInputStream(entry)));
                     String line;
-                    while((line = bufferedReader.readLine()) != null){
+                    while ((line = bufferedReader.readLine()) != null) {
                         content += line;
                     }
                     bufferedReader.close();

@@ -8,6 +8,7 @@ import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 import com.google.gson.reflect.TypeToken;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -24,28 +25,41 @@ public class StoryRepository {
     public Story createNewStory(Story story) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
-                    "INSERT INTO story (userId, likeCount, title, coverArtUrl, status, releasedDate, description, tags) " +
-                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO story (userId, likeCount, title, status, releasedDate, description, tags) " +
+                            "VALUES(?, ?, ?, ?, ?, ?, ?)",
                     statement.RETURN_GENERATED_KEYS);
-            story.setCoverArtUrl(FileUtils.saveFile(story.getCoverArt()));
             statement.setInt(1, story.getUserId());
             statement.setInt(2, story.getLikeCount());
             statement.setString(3, story.getTitle());
-            statement.setString(4, story.getCoverArtUrl());
-            statement.setString(5, story.getStatus().toString());
-            statement.setObject(6, story.getReleasedDate());
-            statement.setString(7, story.getDescription());
-            statement.setString(8, CommonUtils.getGson().toJson(story.getTags()));
+            statement.setString(4, story.getStatus().toString());
+            statement.setObject(5, story.getReleasedDate());
+            statement.setString(6, story.getDescription());
+            statement.setString(7, CommonUtils.getGson().toJson(story.getTags()));
 
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             if (resultSet.next()) {
                 story.setStoryId(resultSet.getInt(1));
+                story.setCoverArtUrl(updateStoryCoverArt(story.getStoryId(), story.getCoverArt()));
+                batchInsertGenres(story.getGenres(), story.getStoryId());
+                return story;
             }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 
-            batchInsertGenres(story.getGenres(), story.getStoryId());
-
-            return story;
+    public String updateStoryCoverArt(int storyId, Part coverArtFile) throws DatabaseOperationException {
+        try {
+            String coverArtUrl = FileUtils.saveFile(coverArtFile, "storyCover/story-cover-" + storyId);
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE story SET coverArtUrl=? WHERE storyId=?"
+            );
+            statement.setString(1, coverArtUrl);
+            statement.setInt(2, storyId);
+            statement.execute();
+            return coverArtUrl;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
