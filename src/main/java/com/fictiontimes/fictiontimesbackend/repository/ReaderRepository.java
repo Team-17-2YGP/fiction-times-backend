@@ -8,10 +8,9 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ReaderRepository {
@@ -65,9 +64,11 @@ public class ReaderRepository {
         try {
             List<User> writerList = new ArrayList<>();
             statement = DBConnection.getConnection().prepareStatement(
-                    "SELECT userId, firstName, lastName, profilePictureUrl " +
-                            "FROM user " +
-                            "WHERE userId IN (SELECT writerId FROM reader_following where readerId=?)" +
+                    "SELECT u.userId, u.firstName, u.lastName, u.profilePictureUrl " +
+                            "FROM user u " +
+                            "INNER JOIN reader_following rf on u.userId = rf.writerId " +
+                            "WHERE rf.readerId = ? " +
+                            "ORDER BY rf.timestamp DESC " +
                             "LIMIT ?"
             );
             statement.setInt(1, userId);
@@ -93,11 +94,12 @@ public class ReaderRepository {
     public void followWriter(int readerId, int writerId) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
-                    "INSERT INTO reader_following VALUES (?, ?, ?)"
+                    "INSERT INTO reader_following VALUES (?, ?, ?, ?)"
             );
             statement.setInt(1, readerId);
             statement.setInt(2, writerId);
             statement.setBoolean(3, false);
+            statement.setObject(4, new Timestamp(new Date().getTime()));
 
             statement.executeUpdate();
         } catch (SQLException | IOException | ClassNotFoundException e) {
