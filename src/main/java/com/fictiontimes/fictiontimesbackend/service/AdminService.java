@@ -51,4 +51,16 @@ public class AdminService{
     public List<Writer> getWritersList(int limit) throws DatabaseOperationException {
         return adminRepository.getWritersList(limit);
     }
+
+    public void unblockUserByUserId(int userId) throws DatabaseOperationException {
+        adminRepository.unblockUserByUserId(userId);
+    }
+
+    public List<Writer> searchWritersByName(String userName) throws DatabaseOperationException {
+        return adminRepository.searchWritersByName(userName);
+    }
+
+    public List<Writer> searchWritersById(int userId) throws DatabaseOperationException {
+        return adminRepository.searchWritersById(userId);
+    }
 }

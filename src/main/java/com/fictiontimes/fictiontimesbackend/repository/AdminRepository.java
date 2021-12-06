@@ -200,4 +200,101 @@ public class AdminRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void unblockUserByUserId(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE user SET userStatus = ? WHERE userId = ?"
+            );
+            statement.setString(1, UserStatus.ACTIVATED.toString());
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Writer> searchWritersByName(String userName) throws DatabaseOperationException {
+        try {
+            List<Writer> writerList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN writer w on u.userId = w.userId " +
+                            "WHERE u.userType = ? AND u.firstName LIKE ? OR u.lastName LIKE ? OR u.userName LIKE ? ORDER BY u.userId DESC"
+            );
+            statement.setString(1, UserType.WRITER.toString());
+            statement.setString(2, "%"+userName+"%");
+            statement.setString(3, "%"+userName+"%");
+            statement.setString(4,"%"+userName+"%");
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Writer writer = new Writer();
+                writer.setUserId(resultSet.getInt(1));
+                writer.setUserName(resultSet.getString(2));
+                writer.setFirstName(resultSet.getString(3));
+                writer.setLastName(resultSet.getString(4));
+                writer.setEmail(resultSet.getString(6));
+                writer.setAddressLane1(resultSet.getString(7));
+                writer.setAddressLane2(resultSet.getString(8));
+                writer.setCity(resultSet.getString(9));
+                writer.setCountry(resultSet.getString(10));
+                writer.setPhoneNumber(resultSet.getString(11));
+                writer.setProfilePictureUrl(resultSet.getString(12));
+                writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                writer.setBusinessAddressLane1(resultSet.getString(16));
+                writer.setBusinessAddressLane2(resultSet.getString(17));
+                writer.setBusinessCity(resultSet.getString(18));
+                writer.setBusinessCountry(resultSet.getString(19));
+                writer.setLandline(resultSet.getString(20));
+                writer.setCurrentBalance(resultSet.getDouble(21));
+                writer.setBio(resultSet.getString(22));
+                writerList.add(writer);
+            }
+            return writerList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Writer> searchWritersById(int userId) throws DatabaseOperationException {
+        try {
+            List<Writer> writerList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN writer w on u.userId = w.userId " +
+                            "WHERE u.userType = ? AND u.userId LIKE ? ORDER BY u.userId DESC"
+            );
+            statement.setString(1, UserType.WRITER.toString());
+            statement.setString(2, "%"+userId+"%");
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Writer writer = new Writer();
+                writer.setUserId(resultSet.getInt(1));
+                writer.setUserName(resultSet.getString(2));
+                writer.setFirstName(resultSet.getString(3));
+                writer.setLastName(resultSet.getString(4));
+                writer.setEmail(resultSet.getString(6));
+                writer.setAddressLane1(resultSet.getString(7));
+                writer.setAddressLane2(resultSet.getString(8));
+                writer.setCity(resultSet.getString(9));
+                writer.setCountry(resultSet.getString(10));
+                writer.setPhoneNumber(resultSet.getString(11));
+                writer.setProfilePictureUrl(resultSet.getString(12));
+                writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                writer.setBusinessAddressLane1(resultSet.getString(16));
+                writer.setBusinessAddressLane2(resultSet.getString(17));
+                writer.setBusinessCity(resultSet.getString(18));
+                writer.setBusinessCountry(resultSet.getString(19));
+                writer.setLandline(resultSet.getString(20));
+                writer.setCurrentBalance(resultSet.getDouble(21));
+                writer.setBio(resultSet.getString(22));
+                writerList.add(writer);
+            }
+            return writerList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
