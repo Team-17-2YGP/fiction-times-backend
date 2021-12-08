@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.User;
@@ -80,5 +81,9 @@ public class ReaderService {
 
     public void updateReaderProfileDetails(Reader readerDetails) throws DatabaseOperationException {
         userRepository.updateUserDetails(readerDetails);
+    }
+
+    public ReaderSearchDTO generalSearch(String keyword) throws DatabaseOperationException {
+        return readerRepository.generalSearch(keyword);
     }
 }

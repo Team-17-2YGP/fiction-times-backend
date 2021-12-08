@@ -12,6 +12,8 @@ public class Episode {
     private Date uploadedAt;
     private String content;
 
+    public Episode() {}
+
     public Episode(int episodeId, int storyId, int episodeNumber, String title, String description, int readCount, Date uploadedAt, String content) {
         this.episodeId = episodeId;
         this.storyId = storyId;
