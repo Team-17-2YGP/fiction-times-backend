@@ -2,12 +2,15 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
+import jakarta.servlet.ServletException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StoryService {
@@ -51,6 +54,15 @@ public class StoryService {
 
     public void deleteGenreById(int genreId) throws DatabaseOperationException {
         genreRepository.deleteGenreById(genreId);
+    }
+
+    public List<ReaderStoryDTO> getRecentlyReleasedStories(int limit) throws ServletException {
+        List<Story> storyList = storyRepository.getRecentlyReleasedStories(limit);
+        List<ReaderStoryDTO> readerStoryDTOList = new ArrayList<>();
+        for (Story story: storyList) {
+            readerStoryDTOList.add(new ReaderStoryDTO(story));
+        }
+        return readerStoryDTOList;
     }
 
     public void saveEpisode(Episode episode, int userId) throws DatabaseOperationException, NoSuchObjectFoundException {
