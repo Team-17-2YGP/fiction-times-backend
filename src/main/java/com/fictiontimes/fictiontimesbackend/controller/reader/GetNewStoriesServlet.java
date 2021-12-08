@@ -23,7 +23,6 @@ public class GetNewStoriesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int limit = Integer.parseInt(request.getParameter("limit"));
         List<ReaderStoryDTO> storyList = storyService.getRecentlyReleasedStories(limit);
-        response.setContentType("application/json");
         response.getWriter().write(CommonUtils.getGson().toJson(storyList));
     }
 }
