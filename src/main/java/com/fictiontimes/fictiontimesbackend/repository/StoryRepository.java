@@ -182,6 +182,36 @@ public class StoryRepository {
         }
     }
 
+    public List<Story> getRecentlyReleasedStories(int limit) throws DatabaseOperationException {
+        try {
+            List<Story> stories = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM story ORDER BY releasedDate DESC LIMIT ?"
+            );
+            statement.setInt(1, limit);
+            ResultSet resultSet = statement.executeQuery();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            while (resultSet.next()) {
+                stories.add(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        getStoryGenreList(resultSet.getInt("storyId"))
+                ));
+            }
+            return stories;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     public void saveEpisode(Episode episode) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(

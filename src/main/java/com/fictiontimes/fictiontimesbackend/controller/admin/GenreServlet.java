@@ -7,6 +7,7 @@ import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.service.StoryService;
+import com.fictiontimes.fictiontimesbackend.service.WriterService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
