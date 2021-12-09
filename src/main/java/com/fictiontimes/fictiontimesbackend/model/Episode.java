@@ -12,6 +12,17 @@ public class Episode {
     private Date uploadedAt;
     private String content;
 
+    public Episode(int episodeId, int storyId, int episodeNumber, String title, String description, int readCount, Date uploadedAt, String content) {
+        this.episodeId = episodeId;
+        this.storyId = storyId;
+        this.episodeNumber = episodeNumber;
+        this.title = title;
+        this.description = description;
+        this.readCount = readCount;
+        this.uploadedAt = uploadedAt;
+        this.content = content;
+    }
+
     public Episode(int storyId, int episodeNumber, String title, String description, int readCount, Date uploadedAt, String content) {
         this.storyId = storyId;
         this.episodeNumber = episodeNumber;

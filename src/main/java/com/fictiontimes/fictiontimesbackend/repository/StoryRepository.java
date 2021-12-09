@@ -230,4 +230,33 @@ public class StoryRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public List<Episode> getEpisodeListByStoryId(int storyId) throws DatabaseOperationException {
+        try {
+            List<Episode> episodes = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT episodeId, storyId, episodeNumber, readCount, uploadedAt, title, description " +
+                            "FROM episode " +
+                            "WHERE storyId = ?"
+            );
+            statement.setInt(1, storyId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                episodes.add(new Episode(
+                        resultSet.getInt("episodeId"),
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("episodeNumber"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("readCount"),
+                        resultSet.getTimestamp("uploadedAt"),
+                        null
+                ));
+            }
+            return episodes;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }

@@ -65,6 +65,15 @@ public class StoryService {
         return readerStoryDTOList;
     }
 
+    public ReaderStoryDTO getStoryDetailsByStoryId(int storyId) throws DatabaseOperationException{
+        Story story = storyRepository.getStoryById(storyId);
+        return  new ReaderStoryDTO(story);
+    }
+
+    public List<Episode> getEpisodeListByStoryId(int storyId) throws DatabaseOperationException{
+        return storyRepository.getEpisodeListByStoryId(storyId);
+    }
+
     public void saveEpisode(Episode episode, int userId) throws DatabaseOperationException, NoSuchObjectFoundException {
         Story story = getStoryById(episode.getStoryId(), userId);
         if (story == null) {
