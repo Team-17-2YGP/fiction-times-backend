@@ -1,13 +1,21 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
-import com.fictiontimes.fictiontimesbackend.model.Reader;
+import com.fictiontimes.fictiontimesbackend.model.*;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.SearchEpisodeDTO;
+import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.model.User;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import com.google.gson.reflect.TypeToken;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -164,6 +172,91 @@ public class ReaderRepository {
             statement.setInt(3, writerId);
 
             statement.executeUpdate();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public ReaderSearchDTO generalSearch(String keyword) throws DatabaseOperationException {
+        try {
+            ReaderSearchDTO readerSearchDTO = new ReaderSearchDTO();
+            // search matching stories
+            statement = DBConnection.getConnection().prepareStatement("SELECT * FROM story");
+            ResultSet resultSet = statement.executeQuery();
+            List<Story> storyList = new ArrayList<>();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            StoryRepository storyRepository = new StoryRepository();
+            while (resultSet.next()) {
+                storyList.add(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        storyRepository.getStoryGenreList(resultSet.getInt("storyId"))
+                ));
+            }
+            List<BoundExtractedResult<Story>> fuseStory = FuzzySearch.extractSorted(keyword, storyList, Story::getTitle, 40);
+            for (BoundExtractedResult<Story> result: fuseStory) {
+                readerSearchDTO.add(new ReaderStoryDTO(result.getReferent()));
+            }
+            // search matching writers
+            statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE user.userType = \"WRITER\"");
+            resultSet = statement.executeQuery();
+            List<User> writerList = new ArrayList<>();
+            while (resultSet.next()) {
+                User writer = new User();
+                writer.setUserId(resultSet.getInt("userId"));
+                writer.setFirstName(resultSet.getString("firstName"));
+                writer.setLastName(resultSet.getString("lastName"));
+                writer.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                writerList.add(writer);
+            }
+            List<BoundExtractedResult<User>> fuseWriter = FuzzySearch.extractSorted(keyword, writerList, x -> x.getFirstName() + " " + x.getLastName(), 40);
+            for (BoundExtractedResult<User> result: fuseWriter) {
+                readerSearchDTO.add(result.getReferent());
+            }
+            // search matching episodes
+            statement = DBConnection.getConnection().prepareStatement("SELECT " +
+                    "episodeId, e.title as title, e.description as description, s.storyId as storyId," +
+                    "s.title as storyTitle, coverArtUrl " +
+                    "FROM episode e JOIN story s ON e.storyId=s.storyId");
+            resultSet = statement.executeQuery();
+            List<SearchEpisodeDTO> episodeList = new ArrayList<>();
+            while (resultSet.next()) {
+                SearchEpisodeDTO episode = new SearchEpisodeDTO();
+                episode.setEpisodeId(resultSet.getInt("episodeId"));
+                episode.setTitle(resultSet.getString("title"));
+                episode.setDescription(resultSet.getString("description"));
+                episode.setStoryId(resultSet.getInt("storyId"));
+                episode.setStoryTitle(resultSet.getString("storyTitle"));
+                episode.setCoverArtUrl(resultSet.getString("coverArtUrl"));
+                episodeList.add(episode);
+            }
+            List<BoundExtractedResult<SearchEpisodeDTO>> fuseEpisode = FuzzySearch.extractSorted(keyword, episodeList, Episode::getTitle, 40);
+            for (BoundExtractedResult<SearchEpisodeDTO> result: fuseEpisode) {
+                readerSearchDTO.add(result.getReferent());
+            }
+            // search matching genres
+            statement = DBConnection.getConnection().prepareStatement("SELECT * FROM genre");
+            resultSet = statement.executeQuery();
+            List<Genre> genreList = new ArrayList<>();
+            while (resultSet.next()) {
+                genreList.add(new Genre(
+                        resultSet.getInt("genreId"),
+                        resultSet.getString("genreName")
+                ));
+            }
+            List<BoundExtractedResult<Genre>> fuseGenre = FuzzySearch.extractSorted(keyword, genreList, Genre::getGenreName, 40);
+            for (BoundExtractedResult<Genre> result: fuseGenre) {
+                readerSearchDTO.add(result.getReferent());
+            }
+            return readerSearchDTO;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

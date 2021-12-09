@@ -127,7 +127,7 @@ public class StoryRepository {
         }
     }
 
-    private List<Genre> getStoryGenreList(int storyId) throws DatabaseOperationException {
+    public List<Genre> getStoryGenreList(int storyId) throws DatabaseOperationException {
         try {
             List<Genre> genreList = new ArrayList<>();
             statement = DBConnection.getConnection().prepareStatement(
