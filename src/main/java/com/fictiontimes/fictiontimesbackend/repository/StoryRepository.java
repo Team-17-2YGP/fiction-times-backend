@@ -12,10 +12,7 @@ import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -207,6 +204,39 @@ public class StoryRepository {
                 ));
             }
             return stories;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void updateStoryLikeCount(int storyId, boolean increment) throws DatabaseOperationException {
+        try {
+            Connection con = DBConnection.getConnection();
+            try {
+                con.setAutoCommit(false);
+                statement = con.prepareStatement(
+                        "SELECT likeCount FROM story WHERE storyId = ?"
+                );
+                statement.setInt(1, storyId);
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+                int likeCount = resultSet.getInt("likeCount");
+                if (increment) likeCount++;
+                else likeCount--;
+
+                statement = con.prepareStatement(
+                        "UPDATE story SET likeCount = ? WHERE storyId = ?"
+                );
+                statement.setInt(1, likeCount);
+                statement.setInt(2, storyId);
+                statement.executeUpdate();
+
+                con.commit();
+            } catch (SQLException e) {
+                throw new DatabaseOperationException(e.getMessage());
+            } finally {
+                con.setAutoCommit(true);
+            }
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

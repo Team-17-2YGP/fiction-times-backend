@@ -8,6 +8,7 @@ import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
@@ -23,11 +24,19 @@ public class ReaderService {
     private UserRepository userRepository;
     private ReaderRepository readerRepository;
     private WriterRepository writerRepository;
+    private StoryRepository storyRepository;
 
     public ReaderService(UserRepository userRepository, ReaderRepository readerRepository, WriterRepository writerRepository) {
         this.userRepository = userRepository;
         this.readerRepository = readerRepository;
         this.writerRepository = writerRepository;
+    }
+
+    public ReaderService(UserRepository userRepository, ReaderRepository readerRepository, WriterRepository writerRepository, StoryRepository storyRepository) {
+        this.userRepository = userRepository;
+        this.readerRepository = readerRepository;
+        this.writerRepository = writerRepository;
+        this.storyRepository = storyRepository;
     }
 
     public Reader getReaderById(int readerId) throws DatabaseOperationException {
@@ -85,5 +94,14 @@ public class ReaderService {
 
     public ReaderSearchDTO generalSearch(String keyword) throws DatabaseOperationException {
         return readerRepository.generalSearch(keyword);
+    }
+
+    public void likeUnlikeStory(int readerId, int storyId, boolean like) throws DatabaseOperationException {
+        if(like) {
+            readerRepository.likeStory(readerId, storyId);
+        } else {
+            readerRepository.unlikeStory(readerId, storyId);
+        }
+        storyRepository.updateStoryLikeCount(storyId, like);
     }
 }
