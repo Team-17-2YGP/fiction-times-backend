@@ -1,8 +1,10 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -248,7 +250,7 @@ public class StoryRepository {
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT * " +
                             "FROM story s " +
-                            "INNER JOIN story_like sl on s.storyId = sl.storyId " +
+                            "INNER JOIN story_like sl ON s.storyId = sl.storyId " +
                             "WHERE sl.readerId = ? " +
                             "ORDER BY sl.timestamp DESC " +
                             "LIMIT ?"
@@ -274,6 +276,44 @@ public class StoryRepository {
                 ));
             }
             return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<StoryReviewDTO> getStoryReviewList(int storyId, int limit, int offset) throws DatabaseOperationException {
+        try {
+            List<StoryReviewDTO> storyReviews = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * " +
+                            "FROM story_review sr " +
+                            "INNER JOIN user u ON sr.readerId = u.userId " +
+                            "WHERE sr.storyId = ? " +
+                            "ORDER BY sr.timestamp DESC " +
+                            "LIMIT ? OFFSET ?"
+            );
+            statement.setInt(1, storyId);
+            statement.setInt(2, limit);
+            statement.setInt(3, offset);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Reader reader = new Reader();
+                reader.setUserId(resultSet.getInt("userId"));
+                reader.setUserName(resultSet.getString("userName"));
+                reader.setFirstName(resultSet.getString("firstName"));
+                reader.setLastName(resultSet.getString("lastName"));
+                reader.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                storyReviews.add(new StoryReviewDTO(
+                        resultSet.getInt("storyId"),
+                        reader,
+                        resultSet.getInt("rating"),
+                        resultSet.getString("review"),
+                        resultSet.getTimestamp("timestamp")
+                ));
+            }
+            return storyReviews;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

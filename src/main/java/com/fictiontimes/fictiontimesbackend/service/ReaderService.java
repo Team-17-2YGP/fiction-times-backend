@@ -114,4 +114,8 @@ public class ReaderService {
     public void addStoryReview(StoryReviewDTO storyReview) throws DatabaseOperationException {
         readerRepository.addStoryReview(storyReview);
     }
+
+    public List<StoryReviewDTO> getStoryReviewList(int storyId, int limit, int offset) throws DatabaseOperationException {
+        return storyRepository.getStoryReviewList(storyId, limit, offset);
+    }
 }

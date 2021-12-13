@@ -1,8 +1,5 @@
 package com.fictiontimes.fictiontimesbackend.controller.reader;
 
-import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
-import com.fictiontimes.fictiontimesbackend.exception.InvalidTokenException;
-import com.fictiontimes.fictiontimesbackend.exception.TokenExpiredException;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
@@ -27,6 +24,6 @@ public class LikeStoryServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         int storyId = Integer.parseInt(request.getParameter("id"));
-        readerService.likeUnlikeStory(readerId,storyId, !request.getRequestURI().endsWith("unlike"));
+        readerService.likeUnlikeStory(readerId, storyId, !request.getRequestURI().endsWith("unlike"));
     }
 }
