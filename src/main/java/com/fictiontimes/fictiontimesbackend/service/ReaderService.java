@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
+import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
@@ -103,5 +104,9 @@ public class ReaderService {
             readerRepository.unlikeStory(readerId, storyId);
         }
         storyRepository.updateStoryLikeCount(storyId, like);
+    }
+
+    public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
+        return storyRepository.getLikedStoriesList(readerId, limit);
     }
 }

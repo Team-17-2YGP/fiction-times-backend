@@ -242,6 +242,43 @@ public class StoryRepository {
         }
     }
 
+    public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
+        try {
+            List<Story> storyList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * " +
+                            "FROM story s " +
+                            "INNER JOIN story_like sl on s.storyId = sl.storyId " +
+                            "WHERE sl.readerId = ? " +
+                            "ORDER BY sl.timestamp DESC " +
+                            "LIMIT ?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, limit);
+
+            ResultSet resultSet = statement.executeQuery();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            while (resultSet.next()) {
+                storyList.add(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        getStoryGenreList(resultSet.getInt("storyId"))
+                ));
+            }
+            return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     public void saveEpisode(Episode episode) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
