@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.SearchEpisodeDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
@@ -285,6 +286,22 @@ public class ReaderRepository {
             statement.setInt(1, readerId);
             statement.setInt(2, storyId);
 
+            statement.executeUpdate();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void addStoryReview(StoryReviewDTO storyReview) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO story_review VALUES (?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, storyReview.getStoryId());
+            statement.setInt(2, storyReview.getReader().getUserId());
+            statement.setInt(3, storyReview.getRating());
+            statement.setString(4, storyReview.getReview());
+            statement.setObject(5, new Timestamp(new Date().getTime()));
             statement.executeUpdate();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());

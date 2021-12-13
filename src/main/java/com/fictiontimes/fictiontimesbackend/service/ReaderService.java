@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Story;
@@ -108,5 +109,9 @@ public class ReaderService {
 
     public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
         return storyRepository.getLikedStoriesList(readerId, limit);
+    }
+
+    public void addStoryReview(StoryReviewDTO storyReview) throws DatabaseOperationException {
+        readerRepository.addStoryReview(storyReview);
     }
 }

@@ -11,6 +11,7 @@ import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class GetLikedStoriesServlet extends HttpServlet {
             new WriterRepository(), new StoryRepository());
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, InvalidTokenException, TokenExpiredException, DatabaseOperationException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
 
         String reqLimit = request.getParameter("limit");
