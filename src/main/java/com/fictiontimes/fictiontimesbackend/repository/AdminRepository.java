@@ -1,11 +1,15 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.Payout;
+import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
+import com.fictiontimes.fictiontimesbackend.service.WriterService;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -293,6 +297,40 @@ public class AdminRepository {
                 writerList.add(writer);
             }
             return writerList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<PayoutAdminDTO> getPayoutList() throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM payout ORDER BY status DESC, requestedAt"
+            );
+            WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
+            ResultSet resultSet = statement.executeQuery();
+            List<PayoutAdminDTO> payoutList = new ArrayList<>();
+            while (resultSet.next()) {
+                Payout payout = new Payout(
+                        resultSet.getInt("payoutId"),
+                        resultSet.getInt("writerId"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getString("accountNumber"),
+                        resultSet.getString("bank"),
+                        resultSet.getString("branch"),
+                        new java.util.Date(resultSet.getTimestamp("requestedAt").getTime()),
+                        resultSet.getString("paymentSlipUrl"),
+                        resultSet.getTimestamp("completedAt") != null?
+                                new java.util.Date(resultSet.getTimestamp("completedAt").getTime()):
+                                null
+                        ,
+                        PayoutStatus.valueOf(resultSet.getString("status"))
+                );
+                payoutList.add(
+                        new PayoutAdminDTO(payout, writerService.getWriterById(payout.getWriterId()))
+                );
+            }
+            return payoutList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

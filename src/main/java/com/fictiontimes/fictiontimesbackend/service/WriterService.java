@@ -51,7 +51,10 @@ public class WriterService {
                             "<td>Payout Id</td>\n" +
                             "<td>Writer Id</td>\n" +
                             "<td>Name</td>\n" +
+                            "<td>Email</td>\n" +
+                            "<td>Phone</td>\n" +
                             "<td>Amount</td>\n" +
+                            "<td>Bank Details</td>\n" +
                             "</tr>\n" +
                             "</thead>\n" +
                             "<tbody>\n" +
@@ -59,7 +62,13 @@ public class WriterService {
                             "<td>#" + savedPayout.getPayoutId() + "</td>\n" +
                             "<td>" + savedPayout.getWriterId() + "</td>\n" +
                             "<td>" + writer.getFirstName() + " " + writer.getLastName() + "</td>\n" +
+                            "<td>" + writer.getEmail() + "</td>\n" +
+                            "<td>" + writer.getPhoneNumber() + ", " + writer.getLandline() + "</td>\n" +
                             "<td>" + savedPayout.getAmount() + "</td>\n" +
+                            "<td> Account No: " + savedPayout.getAccountNumber() +
+                            "</br> Bank: " + savedPayout.getBank() +
+                            "</br> Branch: " + savedPayout.getBranch() +
+                            "</td>\n" +
                             "</tr>\n" +
                             "</tbody>\n" +
                             "</table>",

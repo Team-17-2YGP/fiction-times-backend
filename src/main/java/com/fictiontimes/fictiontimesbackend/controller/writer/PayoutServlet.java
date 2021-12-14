@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/writer/payout")
+@WebServlet("/writer/payouts")
 public class PayoutServlet extends HttpServlet {
 
     WriterService writerService;
