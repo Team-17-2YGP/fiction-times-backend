@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.controller.writer;
 
+import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
@@ -13,8 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/writer/payout")
-public class PayoutServlet extends HttpServlet {
+@WebServlet("/writer/payout/request")
+public class PayoutRequestServlet extends HttpServlet {
 
     WriterService writerService;
 
@@ -24,14 +25,9 @@ public class PayoutServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String queryParam = request.getParameter("id");
-        int writerId = AuthUtils.getUserId(request.getHeader("Authorization"));
-        if (queryParam == null) {
-            response.getWriter().write(CommonUtils.getGson().toJson(writerService.getPayoutList(writerId)));
-        } else {
-            int payoutId = Integer.parseInt(queryParam);
-            response.getWriter().write(CommonUtils.getGson().toJson(writerService.getPayoutById(payoutId, writerId)));
-        }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Payout payout = CommonUtils.getGson().fromJson(request.getReader(), Payout.class);
+        payout.setWriterId(AuthUtils.getUserId(request.getHeader("Authorization")));
+        writerService.requestPayout(payout);
     }
 }

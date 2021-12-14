@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.Payout;
+import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
@@ -11,6 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class WriterRepository {
@@ -149,6 +153,69 @@ public class WriterRepository {
             statement.setInt(1, writerId);
             statement.executeUpdate();
         } catch (ClassNotFoundException | SQLException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Payout getPayoutById(int payoutId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM payout WHERE payoutId = ?"
+            );
+            statement.setInt(1, payoutId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Payout(
+                        resultSet.getInt("payoutId"),
+                        resultSet.getInt("writerId"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getString("accountNumber"),
+                        resultSet.getString("bank"),
+                        resultSet.getString("branch"),
+                        new Date(resultSet.getTimestamp("requestedAt").getTime()),
+                        resultSet.getString("paymentSlipUrl"),
+                        resultSet.getTimestamp("completedAt") != null?
+                                new Date(resultSet.getTimestamp("completedAt").getTime()):
+                                null
+                        ,
+                        PayoutStatus.valueOf(resultSet.getString("status"))
+                );
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Payout> getPayoutList(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM payout WHERE writerId = ?"
+            );
+            statement.setInt(1, writerId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Payout> payoutList = new ArrayList<>();
+            while (resultSet.next()) {
+                 payoutList.add(
+                         new Payout(
+                                 resultSet.getInt("payoutId"),
+                                 resultSet.getInt("writerId"),
+                                 resultSet.getDouble("amount"),
+                                 resultSet.getString("accountNumber"),
+                                 resultSet.getString("bank"),
+                                 resultSet.getString("branch"),
+                                 new Date(resultSet.getTimestamp("requestedAt").getTime()),
+                                 resultSet.getString("paymentSlipUrl"),
+                                 resultSet.getTimestamp("completedAt") != null?
+                                         new Date(resultSet.getTimestamp("completedAt").getTime()):
+                                         null
+                                 ,
+                                 PayoutStatus.valueOf(resultSet.getString("status"))
+                         )
+                 );
+            }
+            return payoutList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
