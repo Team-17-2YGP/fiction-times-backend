@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryRatingDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
@@ -161,6 +162,7 @@ public class StoryRepository {
             if (resultSet.next()) {
                 List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
                 List<Genre> genres = getStoryGenreList(storyId);
+                StoryRatingDTO rating = getStoryRating(storyId);
                 return new Story(
                         storyId,
                         resultSet.getInt("userId"),
@@ -172,7 +174,29 @@ public class StoryRepository {
                         StoryStatus.valueOf(resultSet.getString("status")),
                         resultSet.getTimestamp("releasedDate"),
                         tags,
-                        genres
+                        genres,
+                        rating.getReviewerCount(),
+                        rating.getAverageRating()
+                );
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public StoryRatingDTO getStoryRating(int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT AVG(rating), COUNT(*) FROM story_review WHERE storyId = ?"
+            );
+            statement.setInt(1, storyId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return new StoryRatingDTO(
+                        resultSet.getInt("COUNT(*)"),
+                        resultSet.getFloat("AVG(rating)")
                 );
             }
             return null;
