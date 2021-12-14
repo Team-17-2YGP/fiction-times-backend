@@ -190,7 +190,7 @@ public class WriterRepository {
     public List<Payout> getPayoutList(int writerId) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
-                    "SELECT * FROM payout WHERE writerId = ?"
+                    "SELECT * FROM payout WHERE writerId = ? ORDER BY status DESC, requestedAt"
             );
             statement.setInt(1, writerId);
             ResultSet resultSet = statement.executeQuery();

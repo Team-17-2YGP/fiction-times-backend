@@ -335,4 +335,19 @@ public class AdminRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void markPayoutCompleted(int payoutId, String paymentSlipUrl) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE payout SET paymentSlipUrl = ?, status = ?, completedAt = CURRENT_TIMESTAMP " +
+                            "WHERE payoutId = ?"
+            );
+            statement.setString(1, paymentSlipUrl);
+            statement.setString(2, PayoutStatus.COMPLETED.toString());
+            statement.setInt(3, payoutId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }

@@ -76,4 +76,8 @@ public class AdminService{
         Payout payout = writerRepository.getPayoutById(payoutId);
         return new PayoutAdminDTO(payout, writerRepository.findWriterById(payout.getWriterId()));
     }
+
+    public void markPayoutCompleted(int payoutId, String paymentSlipUrl) throws DatabaseOperationException {
+        adminRepository.markPayoutCompleted(payoutId, paymentSlipUrl);
+    }
 }
