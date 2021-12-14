@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.SearchEpisodeDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
@@ -206,7 +207,7 @@ public class ReaderRepository {
                 readerSearchDTO.add(new ReaderStoryDTO(result.getReferent()));
             }
             // search matching writers
-            statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE user.userType = \"WRITER\"");
+            statement = DBConnection.getConnection().prepareStatement("SELECT * FROM user WHERE user.userType = 'WRITER'");
             resultSet = statement.executeQuery();
             List<User> writerList = new ArrayList<>();
             while (resultSet.next()) {
@@ -257,6 +258,51 @@ public class ReaderRepository {
                 readerSearchDTO.add(result.getReferent());
             }
             return readerSearchDTO;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void likeStory(int readerId, int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO story_like VALUES (?, ?, ?)"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, storyId);
+            statement.setObject(3, new Timestamp(new Date().getTime()));
+
+            statement.executeUpdate();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void unlikeStory(int readerId, int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "DELETE FROM story_like WHERE readerId=? AND storyId=?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, storyId);
+
+            statement.executeUpdate();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void addStoryReview(StoryReviewDTO storyReview) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO story_review VALUES (?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, storyReview.getStoryId());
+            statement.setInt(2, storyReview.getReader().getUserId());
+            statement.setInt(3, storyReview.getRating());
+            statement.setString(4, storyReview.getReview());
+            statement.setObject(5, new Timestamp(new Date().getTime()));
+            statement.executeUpdate();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

@@ -1,8 +1,11 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryRatingDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
+import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -12,10 +15,7 @@ import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,6 +162,7 @@ public class StoryRepository {
             if (resultSet.next()) {
                 List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
                 List<Genre> genres = getStoryGenreList(storyId);
+                StoryRatingDTO rating = getStoryRating(storyId);
                 return new Story(
                         storyId,
                         resultSet.getInt("userId"),
@@ -173,7 +174,29 @@ public class StoryRepository {
                         StoryStatus.valueOf(resultSet.getString("status")),
                         resultSet.getTimestamp("releasedDate"),
                         tags,
-                        genres
+                        genres,
+                        rating.getReviewerCount(),
+                        rating.getAverageRating()
+                );
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public StoryRatingDTO getStoryRating(int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT AVG(rating), COUNT(*) FROM story_review WHERE storyId = ?"
+            );
+            statement.setInt(1, storyId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return new StoryRatingDTO(
+                        resultSet.getInt("COUNT(*)"),
+                        resultSet.getFloat("AVG(rating)")
                 );
             }
             return null;
@@ -207,6 +230,114 @@ public class StoryRepository {
                 ));
             }
             return stories;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void updateStoryLikeCount(int storyId, boolean increment) throws DatabaseOperationException {
+        try {
+            Connection con = DBConnection.getConnection();
+            try {
+                con.setAutoCommit(false);
+                statement = con.prepareStatement(
+                        "SELECT likeCount FROM story WHERE storyId = ?"
+                );
+                statement.setInt(1, storyId);
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+                int likeCount = resultSet.getInt("likeCount");
+                if (increment) likeCount++;
+                else likeCount--;
+
+                statement = con.prepareStatement(
+                        "UPDATE story SET likeCount = ? WHERE storyId = ?"
+                );
+                statement.setInt(1, likeCount);
+                statement.setInt(2, storyId);
+                statement.executeUpdate();
+
+                con.commit();
+            } catch (SQLException e) {
+                throw new DatabaseOperationException(e.getMessage());
+            } finally {
+                con.setAutoCommit(true);
+            }
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
+        try {
+            List<Story> storyList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * " +
+                            "FROM story s " +
+                            "INNER JOIN story_like sl ON s.storyId = sl.storyId " +
+                            "WHERE sl.readerId = ? " +
+                            "ORDER BY sl.timestamp DESC " +
+                            "LIMIT ?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, limit);
+
+            ResultSet resultSet = statement.executeQuery();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            while (resultSet.next()) {
+                storyList.add(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        getStoryGenreList(resultSet.getInt("storyId"))
+                ));
+            }
+            return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<StoryReviewDTO> getStoryReviewList(int storyId, int limit, int offset) throws DatabaseOperationException {
+        try {
+            List<StoryReviewDTO> storyReviews = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * " +
+                            "FROM story_review sr " +
+                            "INNER JOIN user u ON sr.readerId = u.userId " +
+                            "WHERE sr.storyId = ? " +
+                            "ORDER BY sr.timestamp DESC " +
+                            "LIMIT ? OFFSET ?"
+            );
+            statement.setInt(1, storyId);
+            statement.setInt(2, limit);
+            statement.setInt(3, offset);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Reader reader = new Reader();
+                reader.setUserId(resultSet.getInt("userId"));
+                reader.setUserName(resultSet.getString("userName"));
+                reader.setFirstName(resultSet.getString("firstName"));
+                reader.setLastName(resultSet.getString("lastName"));
+                reader.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                storyReviews.add(new StoryReviewDTO(
+                        resultSet.getInt("storyId"),
+                        reader,
+                        resultSet.getInt("rating"),
+                        resultSet.getString("review"),
+                        resultSet.getTimestamp("timestamp")
+                ));
+            }
+            return storyReviews;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

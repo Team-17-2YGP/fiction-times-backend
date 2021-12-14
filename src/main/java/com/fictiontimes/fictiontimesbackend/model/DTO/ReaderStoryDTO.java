@@ -23,6 +23,8 @@ public class ReaderStoryDTO {
     private Timestamp releasedDate;
     private List<String> tags;
     private List<Genre> genres;
+    private int reviewerCount;
+    private float averageRating;
 
     public ReaderStoryDTO(Story story) throws DatabaseOperationException {
         WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
@@ -36,6 +38,8 @@ public class ReaderStoryDTO {
         this.releasedDate = story.getReleasedDate();
         this.tags = story.getTags();
         this.genres = story.getGenres();
+        this.reviewerCount = story.getReviewerCount();
+        this.averageRating = story.getAverageRating();
     }
 
     public int getStoryId() {
@@ -116,5 +120,21 @@ public class ReaderStoryDTO {
 
     public void setGenres(List<Genre> genres) {
         this.genres = genres;
+    }
+
+    public int getReviewerCount() {
+        return reviewerCount;
+    }
+
+    public void setReviewerCount(int reviewerCount) {
+        this.reviewerCount = reviewerCount;
+    }
+
+    public float getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(float averageRating) {
+        this.averageRating = averageRating;
     }
 }

@@ -18,6 +18,8 @@ public class Story {
     private Timestamp releasedDate;
     private List<String> tags;
     private List<Genre> genres;
+    private int reviewerCount;
+    private float averageRating;
 
     public Story(int storyId, int userId, String title, String description, int likeCount, String coverArtUrl,
                  Part coverArt, StoryStatus status,
@@ -33,6 +35,22 @@ public class Story {
         this.releasedDate = releasedDate;
         this.tags = tags;
         this.genres = genres;
+    }
+
+    public Story(int storyId, int userId, String title, String description, int likeCount, String coverArtUrl, Part coverArt, StoryStatus status, Timestamp releasedDate, List<String> tags, List<Genre> genres, int reviewerCount, float averageRating) {
+        this.storyId = storyId;
+        this.userId = userId;
+        this.title = title;
+        this.description = description;
+        this.likeCount = likeCount;
+        this.coverArtUrl = coverArtUrl;
+        this.coverArt = coverArt;
+        this.status = status;
+        this.releasedDate = releasedDate;
+        this.tags = tags;
+        this.genres = genres;
+        this.reviewerCount = reviewerCount;
+        this.averageRating = averageRating;
     }
 
     public int getStoryId() {
@@ -121,5 +139,21 @@ public class Story {
 
     public void setGenres(List<Genre> genres) {
         this.genres = genres;
+    }
+
+    public int getReviewerCount() {
+        return reviewerCount;
+    }
+
+    public void setReviewerCount(int reviewerCount) {
+        this.reviewerCount = reviewerCount;
+    }
+
+    public float getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(float averageRating) {
+        this.averageRating = averageRating;
     }
 }
