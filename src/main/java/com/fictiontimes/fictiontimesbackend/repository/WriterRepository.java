@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 public class WriterRepository {
@@ -109,6 +111,44 @@ public class WriterRepository {
             statement.setInt(7, writer.getUserId());
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Payout requestPayout(Payout payout) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO payout (writerId, amount, accountNumber, bank, branch, status, requestedAt) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    statement.RETURN_GENERATED_KEYS
+            );
+            statement.setInt(1, payout.getWriterId());
+            statement.setDouble(2, payout.getAmount());
+            statement.setString(3, payout.getAccountNumber());
+            statement.setString(4, payout.getBank());
+            statement.setString(5, payout.getBranch());
+            statement.setString(6, payout.getStatus().toString());
+            statement.setTimestamp(7, new Timestamp(payout.getRequestedAt().getTime()));
+            statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                payout.setPayoutId(resultSet.getInt(1));
+            }
+            return payout;
+        } catch (ClassNotFoundException | SQLException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+
+    }
+
+    public void resetWriterBalance(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE writer SET currentBalance = 0 WHERE writer.userId = ?"
+            );
+            statement.setInt(1, writerId);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException | SQLException | IOException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
