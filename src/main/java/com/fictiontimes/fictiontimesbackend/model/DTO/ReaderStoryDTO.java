@@ -25,6 +25,7 @@ public class ReaderStoryDTO {
     private List<Genre> genres;
     private int reviewerCount;
     private float averageRating;
+    private boolean isLiked;
 
     public ReaderStoryDTO(Story story) throws DatabaseOperationException {
         WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
@@ -136,5 +137,13 @@ public class ReaderStoryDTO {
 
     public void setAverageRating(float averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
     }
 }

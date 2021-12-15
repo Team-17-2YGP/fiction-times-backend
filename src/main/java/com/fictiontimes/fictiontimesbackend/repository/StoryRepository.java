@@ -305,6 +305,21 @@ public class StoryRepository {
         }
     }
 
+    public boolean isLikedStory(int readerId, int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM  story_like WHERE readerId =? AND storyId = ?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, storyId);
+
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     public List<StoryReviewDTO> getStoryReviewList(int storyId, int limit, int offset) throws DatabaseOperationException {
         try {
             List<StoryReviewDTO> storyReviews = new ArrayList<>();
