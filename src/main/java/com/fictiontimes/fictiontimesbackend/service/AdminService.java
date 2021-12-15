@@ -1,10 +1,13 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
+import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -62,5 +65,19 @@ public class AdminService{
 
     public List<Writer> searchWritersById(int userId) throws DatabaseOperationException {
         return adminRepository.searchWritersById(userId);
+    }
+
+    public List<PayoutAdminDTO> getPayoutList() throws DatabaseOperationException {
+        return adminRepository.getPayoutList();
+    }
+
+    public PayoutAdminDTO getPayoutById(int payoutId) throws DatabaseOperationException {
+        WriterRepository writerRepository = new WriterRepository();
+        Payout payout = writerRepository.getPayoutById(payoutId);
+        return new PayoutAdminDTO(payout, writerRepository.findWriterById(payout.getWriterId()));
+    }
+
+    public void markPayoutCompleted(int payoutId, String paymentSlipUrl) throws DatabaseOperationException {
+        adminRepository.markPayoutCompleted(payoutId, paymentSlipUrl);
     }
 }

@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Payout;
+import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
@@ -9,6 +11,10 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class WriterRepository {
@@ -108,6 +114,107 @@ public class WriterRepository {
             statement.setString(6, Objects.requireNonNull(writer.getBio()));
             statement.setInt(7, writer.getUserId());
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Payout requestPayout(Payout payout) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO payout (writerId, amount, accountNumber, bank, branch, status, requestedAt) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    statement.RETURN_GENERATED_KEYS
+            );
+            statement.setInt(1, payout.getWriterId());
+            statement.setDouble(2, payout.getAmount());
+            statement.setString(3, payout.getAccountNumber());
+            statement.setString(4, payout.getBank());
+            statement.setString(5, payout.getBranch());
+            statement.setString(6, payout.getStatus().toString());
+            statement.setTimestamp(7, new Timestamp(payout.getRequestedAt().getTime()));
+            statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                payout.setPayoutId(resultSet.getInt(1));
+            }
+            return payout;
+        } catch (ClassNotFoundException | SQLException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+
+    }
+
+    public void resetWriterBalance(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE writer SET currentBalance = 0 WHERE writer.userId = ?"
+            );
+            statement.setInt(1, writerId);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException | SQLException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Payout getPayoutById(int payoutId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM payout WHERE payoutId = ?"
+            );
+            statement.setInt(1, payoutId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Payout(
+                        resultSet.getInt("payoutId"),
+                        resultSet.getInt("writerId"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getString("accountNumber"),
+                        resultSet.getString("bank"),
+                        resultSet.getString("branch"),
+                        new Date(resultSet.getTimestamp("requestedAt").getTime()),
+                        resultSet.getString("paymentSlipUrl"),
+                        resultSet.getTimestamp("completedAt") != null?
+                                new Date(resultSet.getTimestamp("completedAt").getTime()):
+                                null
+                        ,
+                        PayoutStatus.valueOf(resultSet.getString("status"))
+                );
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Payout> getPayoutList(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM payout WHERE writerId = ? ORDER BY status DESC, requestedAt"
+            );
+            statement.setInt(1, writerId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Payout> payoutList = new ArrayList<>();
+            while (resultSet.next()) {
+                 payoutList.add(
+                         new Payout(
+                                 resultSet.getInt("payoutId"),
+                                 resultSet.getInt("writerId"),
+                                 resultSet.getDouble("amount"),
+                                 resultSet.getString("accountNumber"),
+                                 resultSet.getString("bank"),
+                                 resultSet.getString("branch"),
+                                 new Date(resultSet.getTimestamp("requestedAt").getTime()),
+                                 resultSet.getString("paymentSlipUrl"),
+                                 resultSet.getTimestamp("completedAt") != null?
+                                         new Date(resultSet.getTimestamp("completedAt").getTime()):
+                                         null
+                                 ,
+                                 PayoutStatus.valueOf(resultSet.getString("status"))
+                         )
+                 );
+            }
+            return payoutList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
