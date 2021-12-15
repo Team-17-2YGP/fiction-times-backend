@@ -259,4 +259,21 @@ public class StoryRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public String getEpisodeContentByEpisodeId (int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT content FROM episode WHERE episodeId = ?"
+            );
+            statement.setInt(1, episodeId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String episode = resultSet.getString("content");
+                return episode;
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }

@@ -81,4 +81,8 @@ public class StoryService {
         }
         storyRepository.saveEpisode(episode);
     }
+
+    public String getEpisodeContentByEpisodeId(int episodeId) throws DatabaseOperationException{
+        return storyRepository.getEpisodeContentByEpisodeId(episodeId);
+    }
 }
