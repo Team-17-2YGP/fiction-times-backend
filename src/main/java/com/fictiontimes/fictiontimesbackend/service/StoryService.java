@@ -65,9 +65,11 @@ public class StoryService {
         return readerStoryDTOList;
     }
 
-    public ReaderStoryDTO getStoryDetailsByStoryId(int storyId) throws DatabaseOperationException{
+    public ReaderStoryDTO getStoryDetails(int readerId, int storyId) throws DatabaseOperationException{
         Story story = storyRepository.getStoryById(storyId);
-        return  new ReaderStoryDTO(story);
+        ReaderStoryDTO storyDetails = new ReaderStoryDTO(story);
+        storyDetails.setLiked(storyRepository.isLikedStory(readerId, storyId));
+        return  storyDetails;
     }
 
     public List<Episode> getEpisodeListByStoryId(int storyId) throws DatabaseOperationException{
