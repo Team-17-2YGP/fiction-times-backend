@@ -118,4 +118,12 @@ public class ReaderService {
     public List<StoryReviewDTO> getStoryReviewList(int storyId, int limit, int offset) throws DatabaseOperationException {
         return storyRepository.getStoryReviewList(storyId, limit, offset);
     }
+
+    public void addBookmark(int readerId, int episodeId) throws DatabaseOperationException {
+        readerRepository.addBookmark(readerId, episodeId);
+    }
+
+    public void removeBookmark(int readerId, int episodeId) throws DatabaseOperationException {
+        readerRepository.removeBookmark(readerId, episodeId);
+    }
 }
