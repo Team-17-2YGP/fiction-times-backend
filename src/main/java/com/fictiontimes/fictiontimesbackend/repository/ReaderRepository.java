@@ -307,4 +307,31 @@ public class ReaderRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void addBookmark(int readerId, int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO bookmark VALUES (?,?,?)"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2,episodeId);
+            statement.setTimestamp(3, new Timestamp(new Date().getTime()));
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void removeBookmark(int readerId, int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "DELETE FROM bookmark WHERE readerId =? AND episodeId =?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2,episodeId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
