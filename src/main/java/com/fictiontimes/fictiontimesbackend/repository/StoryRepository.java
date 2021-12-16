@@ -422,4 +422,31 @@ public class StoryRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public List<Episode> getBookmarkList(int readerId) throws DatabaseOperationException {
+        try {
+            List<Episode> bookmarkList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM bookmark b INNER JOIN episode e on b.episodeId = e.episodeId " +
+                            "WHERE b.readerId = ? ORDER BY b.timestamp DESC"
+            );
+            statement.setInt(1, readerId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Episode episode = new Episode();
+                episode.setStoryId(resultSet.getInt("storyId"));
+                episode.setEpisodeId(resultSet.getInt("episodeId"));
+                episode.setEpisodeNumber(resultSet.getInt("episodeNUmber"));
+                episode.setTitle(resultSet.getString("title"));
+                episode.setDescription(resultSet.getString("description"));
+                episode.setReadCount(resultSet.getInt("readCount"));
+                episode.setUploadedAt(resultSet.getTimestamp("uploadedAt"));
+                bookmarkList.add(episode);
+            }
+            return bookmarkList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
