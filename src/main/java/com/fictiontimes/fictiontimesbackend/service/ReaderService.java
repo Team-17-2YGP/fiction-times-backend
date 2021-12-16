@@ -1,14 +1,11 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
-import com.fictiontimes.fictiontimesbackend.model.Reader;
-import com.fictiontimes.fictiontimesbackend.model.Story;
-import com.fictiontimes.fictiontimesbackend.model.User;
-import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
@@ -125,5 +122,9 @@ public class ReaderService {
 
     public void removeBookmark(int readerId, int episodeId) throws DatabaseOperationException {
         readerRepository.removeBookmark(readerId, episodeId);
+    }
+
+    public List<Episode> getBookmarkList(int readerId) throws DatabaseOperationException {
+        return storyRepository.getBookmarkList(readerId);
     }
 }
