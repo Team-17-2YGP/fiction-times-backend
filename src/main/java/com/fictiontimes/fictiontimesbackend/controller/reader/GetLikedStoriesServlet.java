@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.controller.reader;
 
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
@@ -30,7 +31,7 @@ public class GetLikedStoriesServlet extends HttpServlet {
         String reqLimit = request.getParameter("limit");
         int limit = (reqLimit == null) ? 20 : Integer.parseInt(reqLimit);
 
-        List<Story> likedStoryList = readerService.getLikedStoriesList(userId, limit);
+        List<ReaderStoryDTO> likedStoryList = readerService.getLikedStoriesList(userId, limit);
         response.getWriter().write(CommonUtils.getGson().toJson(likedStoryList));
     }
 }

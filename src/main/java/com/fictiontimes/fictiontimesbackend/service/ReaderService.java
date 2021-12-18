@@ -2,10 +2,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
-import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereNotifyDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.WriterDetailsDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.*;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
@@ -104,7 +101,7 @@ public class ReaderService {
         storyRepository.updateStoryLikeCount(storyId, like);
     }
 
-    public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
+    public List<ReaderStoryDTO> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
         return storyRepository.getLikedStoriesList(readerId, limit);
     }
 

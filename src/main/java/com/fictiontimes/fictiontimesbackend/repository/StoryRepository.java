@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryRatingDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
@@ -268,9 +269,9 @@ public class StoryRepository {
         }
     }
 
-    public List<Story> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
+    public List<ReaderStoryDTO> getLikedStoriesList(int readerId, int limit) throws DatabaseOperationException {
         try {
-            List<Story> storyList = new ArrayList<>();
+            List<ReaderStoryDTO> storyList = new ArrayList<>();
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT * " +
                             "FROM story s " +
@@ -285,7 +286,7 @@ public class StoryRepository {
             ResultSet resultSet = statement.executeQuery();
             Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
             while (resultSet.next()) {
-                storyList.add(new Story(
+                storyList.add(new ReaderStoryDTO(new Story(
                         resultSet.getInt("storyId"),
                         resultSet.getInt("userId"),
                         resultSet.getString("title"),
@@ -297,7 +298,7 @@ public class StoryRepository {
                         resultSet.getTimestamp("releasedDate"),
                         CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
                         getStoryGenreList(resultSet.getInt("storyId"))
-                ));
+                )));
             }
             return storyList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
@@ -406,7 +407,7 @@ public class StoryRepository {
         }
     }
 
-    public String getEpisodeContentByEpisodeId (int episodeId) throws DatabaseOperationException {
+    public String getEpisodeContentByEpisodeId(int episodeId) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT content FROM episode WHERE episodeId = ?"
