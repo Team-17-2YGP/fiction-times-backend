@@ -101,6 +101,28 @@ public class StoryService {
         }
     }
 
+    public void updateStoryDescription(Story story, int writerId) throws ServletException {
+        Story matchedStory = getStoryById(story.getStoryId());
+        if(matchedStory == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(matchedStory.getUserId() == writerId) {
+            storyRepository.updateStoryDescription(story);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
+    }
+
+    public void deleteStory(int storyId, int writerId) throws ServletException {
+        Story story = getStoryById(storyId);
+        if(story == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(story.getUserId() == writerId) {
+            storyRepository.deleteStory(storyId);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
+    }
+
     public void saveEpisode(Episode episode, int userId) throws DatabaseOperationException, NoSuchObjectFoundException {
         Story story = getStoryById(episode.getStoryId(), userId);
         if (story == null) {

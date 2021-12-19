@@ -66,6 +66,31 @@ public class StoryRepository {
         }
     }
 
+    public void updateStoryDescription(Story story) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE story SET description = ? WHERE storyId = ?"
+            );
+            statement.setString(1, story.getDescription());
+            statement.setInt(2, story.getStoryId());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void deleteStory(int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "DELETE FROM story WHERE storyId = ?"
+            );
+            statement.setInt(1, storyId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     private void batchInsertGenres(List<Genre> genreList, int storyId) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(

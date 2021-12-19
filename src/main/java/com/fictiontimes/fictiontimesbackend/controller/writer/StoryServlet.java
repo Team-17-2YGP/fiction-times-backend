@@ -103,4 +103,20 @@ public class StoryServlet extends HttpServlet {
         }
         response.getWriter().write(payload);
     }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ServletException {
+        int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
+        Story story = CommonUtils.getGson().fromJson(request.getReader(), Story.class);
+        storyService.updateStoryDescription(story, userId);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ServletException {
+        int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
+        int storyId = Integer.parseInt(request.getParameter("id"));
+        storyService.deleteStory(storyId, userId);
+    }
 }
