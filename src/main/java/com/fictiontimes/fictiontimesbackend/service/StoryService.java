@@ -2,7 +2,9 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
+import com.fictiontimes.fictiontimesbackend.exception.UnauthorizedActionException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
@@ -74,6 +76,51 @@ public class StoryService {
 
     public List<Episode> getEpisodeListByStoryId(int storyId) throws DatabaseOperationException{
         return storyRepository.getEpisodeListByStoryId(storyId);
+    }
+
+    /** Check if the story belong to that user (writer), if not throw unauthorized*/
+    public List<Episode> getEpisodeListByStoryId(int storyId, int writerId) throws ServletException {
+        Story story = getStoryById(storyId);
+        if(story == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(story.getUserId() == writerId) {
+            return storyRepository.getEpisodeListByStoryId(storyId);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
+    }
+
+    public List<StoryReviewDTO> getStoryReviewListByStoryId(int storyId, int writerId, int limit, int offset) throws ServletException {
+        Story story = getStoryById(storyId);
+        if(story == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(story.getUserId() == writerId) {
+            return storyRepository.getStoryReviewList(storyId, limit, offset);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
+    }
+
+    public void updateStoryDescription(Story story, int writerId) throws ServletException {
+        Story matchedStory = getStoryById(story.getStoryId());
+        if(matchedStory == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(matchedStory.getUserId() == writerId) {
+            storyRepository.updateStoryDescription(story);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
+    }
+
+    public void deleteStory(int storyId, int writerId) throws ServletException {
+        Story story = getStoryById(storyId);
+        if(story == null){
+            throw new NoSuchObjectFoundException("Invalid story id");
+        } else if(story.getUserId() == writerId) {
+            storyRepository.deleteStory(storyId);
+        } else {
+            throw new UnauthorizedActionException("Story does not belong to the writer");
+        }
     }
 
     public void saveEpisode(Episode episode, int userId) throws DatabaseOperationException, NoSuchObjectFoundException {
