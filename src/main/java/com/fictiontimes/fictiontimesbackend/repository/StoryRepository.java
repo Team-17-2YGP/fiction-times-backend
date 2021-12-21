@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderEpisodeDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryRatingDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
@@ -471,6 +472,49 @@ public class StoryRepository {
                 bookmarkList.add(episode);
             }
             return bookmarkList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public boolean isBookmarkedEpisode(int readerId, int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM  bookmark WHERE readerId = ? AND episodeId = ?"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2, episodeId);
+
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Episode getEpisodeById(int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT episodeId, storyId, episodeNumber, readCount, uploadedAt, title, description " +
+                            "FROM episode " +
+                            "WHERE episodeId = ?"
+            );
+            statement.setInt(1, episodeId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return new Episode (
+                        resultSet.getInt("episodeId"),
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("episodeNumber"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("readCount"),
+                        resultSet.getTimestamp("uploadedAt"),
+                        null
+                );
+            }
+            return null;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

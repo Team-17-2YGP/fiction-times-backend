@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
 import com.fictiontimes.fictiontimesbackend.exception.UnauthorizedActionException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderEpisodeDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
@@ -133,5 +134,22 @@ public class StoryService {
 
     public String getEpisodeContentByEpisodeId(int episodeId) throws DatabaseOperationException{
         return storyRepository.getEpisodeContentByEpisodeId(episodeId);
+    }
+
+    public ReaderEpisodeDTO getEpisodeDetails(int readerId, int episodeId) throws DatabaseOperationException{
+        Episode episode = storyRepository.getEpisodeById(episodeId);
+        ReaderEpisodeDTO episodeDetails = new ReaderEpisodeDTO(
+                episode.getEpisodeId(),
+                episode.getStoryId(),
+                episode.getEpisodeNumber(),
+                episode.getTitle(),
+                episode.getDescription(),
+                episode.getReadCount(),
+                episode.getUploadedAt(),
+                null,
+                storyRepository.isBookmarkedEpisode(readerId, episodeId),
+                storyRepository.getStoryById(episode.getStoryId())
+        );
+        return  episodeDetails;
     }
 }
