@@ -37,7 +37,7 @@ public class StoryService {
         List<User> subscribedReaders = userRepository.getNotificationsSubscribedReadersByWriterId(story.getUserId());
         EmailUtils.sendEmailBulk(
                 subscribedReaders,
-                "New story from " + writer.getFirstName() + " " + writer.getLastName() + ": " + story.getTitle(),
+                "New story by " + writer.getFirstName() + " " + writer.getLastName() + ": " + story.getTitle(),
                 "Click below to view the new story: ",
                 CommonUtils.getFrontendAddress() + "/dashboard/reader/?page=home&storyID=" + story.getStoryId()
         );

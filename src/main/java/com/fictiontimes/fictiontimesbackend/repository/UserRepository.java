@@ -374,4 +374,55 @@ public class UserRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public List<Notification> getUnreadNotificationsByUserId(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM notification WHERE userId = ? AND isRead = 0 " +
+                            "ORDER BY timestamp DESC"
+            );
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Notification> notifications = new ArrayList<>();
+            while (resultSet.next()) {
+                notifications.add(new Notification(
+                        resultSet.getInt("notificationId"),
+                        userId,
+                        resultSet.getString("title"),
+                        resultSet.getString("content"),
+                        resultSet.getString("link"),
+                        resultSet.getBoolean("isRead"),
+                        resultSet.getTimestamp("timestamp")
+                ));
+            }
+            return notifications;
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void markReadNotification(int notificationId, int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE notification SET isRead = 1 WHERE notificationId = ? AND userId = ?"
+            );
+            statement.setInt(1, notificationId);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void markReadAllNotifications(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE notification SET isRead = 1 WHERE userId = ?"
+            );
+            statement.setInt(1, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }

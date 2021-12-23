@@ -82,7 +82,7 @@ public class UserService {
         Notification notification = new Notification(
                 0,
                 0,
-                "New Writer Registration Request",
+                "New writer registration request",
                 applicant.getFirstName() + " " + applicant.getLastName() + " . " + applicant.getCountry(),
                 CommonUtils.getFrontendAddress() + "/dashboard/admin/?page=manageApplicants",
                 false,
@@ -116,5 +116,16 @@ public class UserService {
             FileUtils.deleteFile(matchedUser.getProfilePictureUrl());
         }
         userRepository.updateProfilePicture(userId, profilePictureFile);
+    }
+
+    public List<Notification> getUnreadNotifications(int userId) throws DatabaseOperationException {
+        return userRepository.getUnreadNotificationsByUserId(userId);
+    }
+
+    public void markReadNotification(int notificationId, int userId) throws DatabaseOperationException {
+        userRepository.markReadNotification(notificationId, userId);
+    }
+    public void markReadAllNotifications(int userId) throws DatabaseOperationException {
+        userRepository.markReadAllNotifications(userId);
     }
 }
