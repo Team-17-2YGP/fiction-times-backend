@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.UnauthorizedActionException;
+import com.fictiontimes.fictiontimesbackend.model.Notification;
 import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
@@ -10,8 +11,10 @@ import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
+import com.fictiontimes.fictiontimesbackend.utils.NotificationUtils;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -76,6 +79,18 @@ public class WriterService {
                             "</table>",
                     CommonUtils.getFrontendAddress() + "/login"
             );
+
+            Notification notification = new Notification(
+                    0,
+                    0,
+                    "New writer payout request",
+                    writer.getFirstName() + " " + writer.getLastName() + " . LKR " + payout.getAmount(),
+                    CommonUtils.getFrontendAddress() + "/dashboard/admin/?page=transactions",
+                    false,
+                    new Timestamp(new Date().getTime())
+            );
+            NotificationUtils.sendNotificationBulk(adminUsers, notification);
+
             writerRepository.resetWriterBalance(writer.getUserId());
         } else {
             throw new UnauthorizedActionException("Invalid request, not enough balance to request a payout");

@@ -1,11 +1,9 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
-import com.fictiontimes.fictiontimesbackend.model.Reader;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.model.User;
-import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 import jakarta.servlet.http.Part;
 
@@ -293,6 +291,50 @@ public class UserRepository {
             statement.setString(8, Objects.requireNonNull(user.getPhoneNumber()));
             statement.setInt(9, user.getUserId());
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void sendNotification(Notification notification) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO notification (userId, title, content, link, isRead, timestamp)" +
+                            "VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, notification.getUserId());
+            statement.setString(2, notification.getTitle());
+            statement.setString(3, notification.getContent());
+            statement.setString(4, notification.getLink());
+            statement.setBoolean(5, notification.isRead());
+            statement.setObject(6, notification.getTimestamp());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void sendNotificationBulk(List<User> users, Notification notification) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO notification (userId, title, content, link, isRead, timestamp)" +
+                            "VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            int i = 0;
+
+            for (User user: users) {
+                statement.setInt(1, user.getUserId());
+                statement.setString(2, notification.getTitle());
+                statement.setString(3, notification.getContent());
+                statement.setString(4, notification.getLink());
+                statement.setBoolean(5, notification.isRead());
+                statement.setObject(6, notification.getTimestamp());
+                statement.addBatch();
+                i++;
+                if (i % 1000 == 0 || i == users.size()) {
+                    statement.executeBatch(); // Execute every 1000 items.
+                }
+            }
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

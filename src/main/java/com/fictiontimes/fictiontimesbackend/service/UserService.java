@@ -3,19 +3,18 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereFormDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.UserPasswordDTO;
+import com.fictiontimes.fictiontimesbackend.model.Notification;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
-import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
-import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
-import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
-import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
+import com.fictiontimes.fictiontimesbackend.utils.*;
 import jakarta.servlet.http.Part;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -71,7 +70,6 @@ public class UserService {
     }
 
     public void sendNewWriterRegistrationRequestNotification(User applicant) {
-        // TODO: Add this as a notification
         List<User> adminUsers = userRepository.getAdminUsers();
         EmailUtils.sendEmailBulk(
                 adminUsers,
@@ -80,6 +78,17 @@ public class UserService {
                         + "Review Id: " +  applicant.getUserId() + "<br />",
                 CommonUtils.getFrontendAddress() + "/login"
         );
+
+        Notification notification = new Notification(
+                0,
+                0,
+                "New Writer Registration Request",
+                applicant.getFirstName() + " " + applicant.getLastName() + " . " + applicant.getCountry(),
+                CommonUtils.getFrontendAddress() + "/dashboard/admin/?page=manageApplicants",
+                false,
+                new Timestamp(new Date().getTime())
+        );
+        NotificationUtils.sendNotificationBulk(adminUsers, notification);
     }
 
     public void activateUserProfile(User user) {
