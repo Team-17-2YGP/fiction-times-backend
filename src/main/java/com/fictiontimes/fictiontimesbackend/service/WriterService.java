@@ -35,8 +35,10 @@ public class WriterService {
 
     public void requestPayout(Payout payout) throws DatabaseOperationException, IOException, UnauthorizedActionException {
         Writer writer = getWriterById(payout.getWriterId());
+        double currentAmount = getCurrentAmountByWriterId(writer.getUserId());
         // Only 10,000 lkr or more withdraws are allowed, just an arbitrary value should be changed
-        if (payout.getAmount() == writer.getCurrentBalance() && writer.getCurrentBalance() >= 10000) {
+        if (currentAmount >= 10000) {
+            payout.setAmount(currentAmount);
             payout.setStatus(PayoutStatus.PENDING);
             payout.setRequestedAt(new Date());
             Payout savedPayout = writerRepository.requestPayout(payout);
@@ -76,8 +78,16 @@ public class WriterService {
             );
             writerRepository.resetWriterBalance(writer.getUserId());
         } else {
-            throw new UnauthorizedActionException("Invalid request, the amount not accurate");
+            throw new UnauthorizedActionException("Invalid request, not enough balance to request a payout");
         }
+    }
+
+    public double getCurrentAmountByWriterId(int writerId) throws DatabaseOperationException {
+        long milliSeconds = writerRepository.getMilliSecondsSinceTheLastPayout(writerId);
+        // 1 view -> 5 minutes of read time
+        // 3.6 rupees -> 5 min
+        // 1 ms -> (3*10^-4)/25 rupees
+        return milliSeconds*Math.pow(10, -4)*(3.0/25);
     }
 
     public List<Payout> getPayoutList(int writerId) throws DatabaseOperationException {

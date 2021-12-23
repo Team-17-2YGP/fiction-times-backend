@@ -334,4 +334,20 @@ public class ReaderRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void saveTimeData(TimeData timeData) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO episode_time_data VALUES(?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, timeData.getEpisodeId());
+            statement.setInt(2, timeData.getReaderId());
+            statement.setTimestamp(3, new Timestamp(timeData.getOpen().getTime()));
+            statement.setTimestamp(4, new Timestamp(timeData.getClose().getTime()));
+            statement.setLong(5, timeData.getDuration());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }

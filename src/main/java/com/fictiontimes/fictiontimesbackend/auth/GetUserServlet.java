@@ -52,6 +52,7 @@ public class GetUserServlet extends HttpServlet {
                 break;
             case WRITER:
                 Writer writer = writerService.getWriterById(userId);
+                writer.setCurrentBalance(writerService.getCurrentAmountByWriterId(writer.getUserId()));
                 response.getWriter().write(CommonUtils.getGson().toJson(writer));
                 break;
             case WRITER_APPLICANT:

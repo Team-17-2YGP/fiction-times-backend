@@ -219,4 +219,25 @@ public class WriterRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public long getMilliSecondsSinceTheLastPayout(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT SUM(duration) as totalDuration from episode_time_data " +
+                            "join episode e on e.episodeId = episode_time_data.episodeId " +
+                            "join story s on e.storyId = s.storyId " +
+                            "where closeTime > (SELECT MAX(requestedAt) as lastPayoutTime from payout where writerId = ?) " +
+                            "and s.userId = ?"
+            );
+            statement.setInt(1, writerId);
+            statement.setInt(2, writerId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getLong("totalDuration");
+            }
+            return 0;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
