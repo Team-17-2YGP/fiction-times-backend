@@ -3,30 +3,55 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
 import com.fictiontimes.fictiontimesbackend.exception.UnauthorizedActionException;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderEpisodeDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
-import com.fictiontimes.fictiontimesbackend.model.Episode;
-import com.fictiontimes.fictiontimesbackend.model.Genre;
-import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
+import com.fictiontimes.fictiontimesbackend.utils.NotificationUtils;
 import jakarta.servlet.ServletException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class StoryService {
     private final StoryRepository storyRepository;
     private final GenreRepository genreRepository;
+    private final UserRepository userRepository;
 
-    public StoryService(StoryRepository storyRepository, GenreRepository genreRepository){
+    public StoryService(StoryRepository storyRepository, GenreRepository genreRepository, UserRepository userRepository){
         this.storyRepository = storyRepository;
         this.genreRepository = genreRepository;
+        this.userRepository = userRepository;
     }
 
     public Story createNewStory(Story story) throws DatabaseOperationException {
         story = storyRepository.createNewStory(story);
+        User writer = userRepository.findUserByUserId(story.getUserId());
+        List<User> subscribedReaders = userRepository.getNotificationsSubscribedReadersByWriterId(story.getUserId());
+        EmailUtils.sendEmailBulk(
+                subscribedReaders,
+                "New story from " + writer.getFirstName() + " " + writer.getLastName() + ": " + story.getTitle(),
+                "Click below to view the new story: ",
+                CommonUtils.getFrontendAddress() + "/dashboard/reader/?page=home&storyID=" + story.getStoryId()
+        );
+
+        Notification notification = new Notification(
+                0,
+                0,
+                "New story: " + story.getTitle(),
+                "By " + writer.getFirstName() + " " + writer.getLastName(),
+                CommonUtils.getFrontendAddress() + "/dashboard/reader/?page=home&storyID=" + story.getStoryId(),
+                false,
+                new Timestamp(new Date().getTime())
+        );
+        NotificationUtils.sendNotificationBulk(subscribedReaders, notification);
         return story;
     }
 
@@ -129,7 +154,29 @@ public class StoryService {
         if (story == null) {
             throw new NoSuchObjectFoundException("Story object by the received story id doesn't exist");
         }
-        storyRepository.saveEpisode(episode);
+        episode = storyRepository.saveEpisode(episode);
+
+        User writer = userRepository.findUserByUserId(story.getUserId());
+        List<User> subscribedReaders = userRepository.getNotificationsSubscribedReadersByWriterId(story.getUserId());
+        EmailUtils.sendEmailBulk(
+                subscribedReaders,
+                "New episode: " + episode.getTitle(),
+                writer.getFirstName() + " " +writer.getLastName() + " just released a new episode for " +
+                        story.getTitle() + " <br>" +
+                        "Click below to read the episode: ",
+                CommonUtils.getFrontendAddress() + "/reader/?episodeID=" + episode.getEpisodeId()
+        );
+
+        Notification notification = new Notification(
+                0,
+                0,
+                "New episode: " + episode.getTitle(),
+                story.getTitle() + " . " + writer.getFirstName() + " " + writer.getLastName(),
+                CommonUtils.getFrontendAddress() + "/reader/?episodeID=" + episode.getEpisodeId(),
+                false,
+                new Timestamp(new Date().getTime())
+        );
+        NotificationUtils.sendNotificationBulk(subscribedReaders, notification);
     }
 
     public String getEpisodeContentByEpisodeId(int episodeId) throws DatabaseOperationException{

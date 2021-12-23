@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.controller.reader;
 import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.service.StoryService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.ServletException;
@@ -17,7 +18,7 @@ import java.util.List;
 @WebServlet("/reader/story/new")
 public class GetNewStoriesServlet extends HttpServlet {
 
-    StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
+    StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository(), new UserRepository());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
