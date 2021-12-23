@@ -124,4 +124,9 @@ public class ReaderService {
     public List<Episode> getBookmarkList(int readerId) throws DatabaseOperationException {
         return storyRepository.getBookmarkList(readerId);
     }
+
+    public void saveTimeData(TimeData timeData) throws DatabaseOperationException {
+        timeData.setDuration(timeData.getClose().getTime() - timeData.getOpen().getTime());
+        readerRepository.saveTimeData(timeData);
+    }
 }
