@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Notification;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
@@ -292,6 +293,133 @@ public class UserRepository {
             statement.setString(7, Objects.requireNonNull(user.getCountry()));
             statement.setString(8, Objects.requireNonNull(user.getPhoneNumber()));
             statement.setInt(9, user.getUserId());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void sendNotification(Notification notification) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO notification (userId, title, content, link, isRead, timestamp)" +
+                            "VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, notification.getUserId());
+            statement.setString(2, notification.getTitle());
+            statement.setString(3, notification.getContent());
+            statement.setString(4, notification.getLink());
+            statement.setBoolean(5, notification.isRead());
+            statement.setObject(6, notification.getTimestamp());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void sendNotificationBulk(List<User> users, Notification notification) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO notification (userId, title, content, link, isRead, timestamp)" +
+                            "VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            int i = 0;
+
+            for (User user: users) {
+                statement.setInt(1, user.getUserId());
+                statement.setString(2, notification.getTitle());
+                statement.setString(3, notification.getContent());
+                statement.setString(4, notification.getLink());
+                statement.setBoolean(5, notification.isRead());
+                statement.setObject(6, notification.getTimestamp());
+                statement.addBatch();
+                i++;
+                if (i % 1000 == 0 || i == users.size()) {
+                    statement.executeBatch(); // Execute every 1000 items.
+                }
+            }
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<User> getNotificationsSubscribedReadersByWriterId(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader_following rf ON u.userId = rf.readerId " +
+                            "WHERE rf.writerId = ? AND rf.notification = 1"
+            );
+            statement.setInt(1, writerId);
+            ResultSet resultSet = statement.executeQuery();
+            List<User> readers = new ArrayList<>();
+            while (resultSet.next()) {
+                User reader = new User();
+                reader.setUserId(resultSet.getInt("userId"));
+                reader.setUserName(resultSet.getString("userName"));
+                reader.setFirstName(resultSet.getString("firstName"));
+                reader.setLastName(resultSet.getString("lastName"));
+                reader.setEmail(resultSet.getString("email"));
+                reader.setAddressLane1(resultSet.getString("addressLane1"));
+                reader.setAddressLane2(resultSet.getString("addressLane2"));
+                reader.setCity(resultSet.getString("city"));
+                reader.setCountry(resultSet.getString("country"));
+                reader.setPhoneNumber(resultSet.getString("phoneNumber"));
+                reader.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                reader.setUserType(UserType.valueOf(resultSet.getString("userType")));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString("userStatus")));
+                readers.add(reader);
+            }
+            return readers;
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Notification> getUnreadNotificationsByUserId(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM notification WHERE userId = ? AND isRead = 0 " +
+                            "ORDER BY timestamp DESC"
+            );
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Notification> notifications = new ArrayList<>();
+            while (resultSet.next()) {
+                notifications.add(new Notification(
+                        resultSet.getInt("notificationId"),
+                        userId,
+                        resultSet.getString("title"),
+                        resultSet.getString("content"),
+                        resultSet.getString("link"),
+                        resultSet.getBoolean("isRead"),
+                        resultSet.getTimestamp("timestamp")
+                ));
+            }
+            return notifications;
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void markReadNotification(int notificationId, int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE notification SET isRead = 1 WHERE notificationId = ? AND userId = ?"
+            );
+            statement.setInt(1, notificationId);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void markReadAllNotifications(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE notification SET isRead = 1 WHERE userId = ?"
+            );
+            statement.setInt(1, userId);
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());

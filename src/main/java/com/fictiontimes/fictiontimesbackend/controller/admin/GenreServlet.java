@@ -6,6 +6,7 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.ErrorDTO;
 import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.repository.GenreRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.service.StoryService;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -19,7 +20,7 @@ import java.io.IOException;
 @WebServlet("/admin/genre")
 public class GenreServlet extends HttpServlet {
 
-    private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository());
+    private final StoryService storyService = new StoryService(new StoryRepository(), new GenreRepository(), new UserRepository());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

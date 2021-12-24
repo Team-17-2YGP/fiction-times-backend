@@ -2,13 +2,18 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.Notification;
 import com.fictiontimes.fictiontimesbackend.model.Payout;
-import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
+import com.fictiontimes.fictiontimesbackend.utils.NotificationUtils;
 
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +82,24 @@ public class AdminService{
         return new PayoutAdminDTO(payout, writerRepository.findWriterById(payout.getWriterId()));
     }
 
-    public void markPayoutCompleted(int payoutId, String paymentSlipUrl) throws DatabaseOperationException {
+    public void markPayoutCompleted(int payoutId, String paymentSlipUrl) throws DatabaseOperationException, IOException {
         adminRepository.markPayoutCompleted(payoutId, paymentSlipUrl);
+        PayoutAdminDTO payout = getPayoutById(payoutId);
+        EmailUtils.sendMail(payout.getWriter(), "Payout complete",
+                "The payout request of LKR " + payout.getAmount() + " has been successfully " +
+                        "deposited to your account: <br>" +
+                        payout.getAccountNumber() + ", " + payout.getBank() + " " + payout.getBranch() + ". <br>" +
+                        "View the payment slip, ", paymentSlipUrl);
+
+        Notification notification = new Notification(
+                0,
+                payout.getWriterId(),
+                "Payout complete",
+                "LKR " + payout.getAmount() + " . " + payout.getBank(),
+                CommonUtils.getFrontendAddress() + "/dashboard/writer/?page=payouts&payoutId=" + payout.getPayoutId(),
+                false,
+                new Timestamp(new Date().getTime())
+        );
+        NotificationUtils.sendNotification(notification);
     }
 }

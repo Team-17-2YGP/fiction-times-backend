@@ -385,11 +385,12 @@ public class StoryRepository {
         }
     }
 
-    public void saveEpisode(Episode episode) throws DatabaseOperationException {
+    public Episode saveEpisode(Episode episode) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
                     "INSERT INTO episode(storyId, episodeNumber, title, description, readCount, uploadedAt, content) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?)"
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    statement.RETURN_GENERATED_KEYS
             );
             statement.setInt(1, episode.getStoryId());
             statement.setInt(2, episode.getEpisodeNumber());
@@ -399,6 +400,12 @@ public class StoryRepository {
             statement.setDate(6, new Date(episode.getUploadedAt().getTime()));
             statement.setString(7, episode.getContent());
             statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                episode.setEpisodeId(resultSet.getInt(1));
+                return episode;
+            }
+            return null;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
