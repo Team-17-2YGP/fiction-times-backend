@@ -12,6 +12,7 @@ import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -121,8 +122,25 @@ public class ReaderService {
         readerRepository.removeBookmark(readerId, episodeId);
     }
 
-    public List<Episode> getBookmarkList(int readerId) throws DatabaseOperationException {
-        return storyRepository.getBookmarkList(readerId);
+    public List<ReaderEpisodeDTO> getBookmarkList(int readerId) throws DatabaseOperationException {
+        List<Episode> episodeList = storyRepository.getBookmarkList(readerId);
+        List<ReaderEpisodeDTO> bookmarkList = new ArrayList<>();
+        for (Episode episode : episodeList) {
+            ReaderEpisodeDTO episodeDetails = new ReaderEpisodeDTO(
+                    episode.getEpisodeId(),
+                    episode.getStoryId(),
+                    episode.getEpisodeNumber(),
+                    episode.getTitle(),
+                    episode.getDescription(),
+                    episode.getReadCount(),
+                    episode.getUploadedAt(),
+                    null,
+                    true,
+                    storyRepository.getStoryById(episode.getStoryId())
+            );
+            bookmarkList.add(episodeDetails);
+        }
+        return bookmarkList;
     }
 
     public void saveTimeData(TimeData timeData) throws DatabaseOperationException {
