@@ -1,5 +1,6 @@
 package com.fictiontimes.fictiontimesbackend.controller.reader;
 
+import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderEpisodeDTO;
 import com.fictiontimes.fictiontimesbackend.model.Episode;
 import com.fictiontimes.fictiontimesbackend.repository.*;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
@@ -24,7 +25,7 @@ public class GetBookmarkListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
-        List<Episode> bookmarkList = readerService.getBookmarkList(readerId);
+        List<ReaderEpisodeDTO> bookmarkList = readerService.getBookmarkList(readerId);
         response.getWriter().write(CommonUtils.getGson().toJson(bookmarkList));
     }
 }
