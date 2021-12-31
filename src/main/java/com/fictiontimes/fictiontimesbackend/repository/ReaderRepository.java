@@ -350,4 +350,18 @@ public class ReaderRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public void markAsRead(int readerId, int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO episode_read VALUES (?,?,?)"
+            );
+            statement.setInt(1, readerId);
+            statement.setInt(2,episodeId);
+            statement.setTimestamp(3, new Timestamp(new Date().getTime()));
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
