@@ -135,6 +135,7 @@ public class ReaderService {
                     episode.getReadCount(),
                     episode.getUploadedAt(),
                     null,
+                    storyRepository.finishedReading(readerId, episode.getEpisodeId()),
                     true,
                     storyRepository.getStoryById(episode.getStoryId())
             );
@@ -146,5 +147,9 @@ public class ReaderService {
     public void saveTimeData(TimeData timeData) throws DatabaseOperationException {
         timeData.setDuration(timeData.getClose().getTime() - timeData.getOpen().getTime());
         readerRepository.saveTimeData(timeData);
+    }
+
+    public void markAsRead(int readerId, int episodeId) throws DatabaseOperationException {
+        readerRepository.markAsRead(readerId, episodeId);
     }
 }

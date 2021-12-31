@@ -194,6 +194,7 @@ public class StoryService {
                 episode.getReadCount(),
                 episode.getUploadedAt(),
                 null,
+                storyRepository.finishedReading(readerId, episodeId),
                 storyRepository.isBookmarkedEpisode(readerId, episodeId),
                 storyRepository.getStoryById(episode.getStoryId())
         );
