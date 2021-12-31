@@ -2,14 +2,8 @@ package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
-import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderSearchDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderStoryDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.SearchEpisodeDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.StoryReviewDTO;
-import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.DTO.*;
+import com.fictiontimes.fictiontimesbackend.model.Types.*;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.google.gson.reflect.TypeToken;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
@@ -63,6 +57,29 @@ public class ReaderRepository {
             statement = DBConnection.getConnection().prepareStatement("UPDATE reader SET subscriptionStatus = ? WHERE userId = ?");
             statement.setString(1, SubscriptionStatus.VERIFIED.toString());
             statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void saveReaderPaymentDetails(PayhereNotifyDTO payhereNotifyDTO, int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO subscription_payment (userId, paymentId, subscriptionId, amount, currency, " +
+                            "paymentMethod, status, nextPaymentDate, noOfPaymentsReceived, timestamp) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            statement.setInt(1, userId);
+            statement.setString(2, payhereNotifyDTO.getPayment_id());
+            statement.setString(3, payhereNotifyDTO.getSubscription_id());
+            statement.setDouble(4, payhereNotifyDTO.getPayhere_amount());
+            statement.setString(5, payhereNotifyDTO.getPayhere_currency());
+            statement.setString(6, payhereNotifyDTO.getMethod());
+            statement.setString(7, payhereNotifyDTO.getMessage_type().toString());
+            statement.setObject(8, new Timestamp(payhereNotifyDTO.getItem_rec_date_next().getTime()));
+            statement.setInt(9, payhereNotifyDTO.getItem_rec_install_paid());
+            statement.setObject(10, new Timestamp(new Date().getTime()));
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
