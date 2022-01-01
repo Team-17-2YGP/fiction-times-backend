@@ -1,14 +1,12 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
-import com.fictiontimes.fictiontimesbackend.model.User;
-import com.fictiontimes.fictiontimesbackend.model.Writer;
-import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
 
 import java.io.IOException;
@@ -346,6 +344,114 @@ public class AdminRepository {
             statement.setString(2, PayoutStatus.COMPLETED.toString());
             statement.setInt(3, payoutId);
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Reader> getReadersList(int limit) throws DatabaseOperationException {
+        try {
+            List<Reader> readersList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader r on u.userId = r.userId " +
+                            "WHERE u.userType = ? ORDER BY u.userId DESC " +
+                            "LIMIT ?"
+            );
+            statement.setString(1, UserType.READER.toString());
+            statement.setInt(2, limit);
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Reader reader = new Reader();
+                reader.setUserId(resultSet.getInt(1));
+                reader.setUserName(resultSet.getString(2));
+                reader.setFirstName(resultSet.getString(3));
+                reader.setLastName(resultSet.getString(4));
+                reader.setEmail(resultSet.getString(6));
+                reader.setAddressLane1(resultSet.getString(7));
+                reader.setAddressLane2(resultSet.getString(8));
+                reader.setCity(resultSet.getString(9));
+                reader.setCountry(resultSet.getString(10));
+                reader.setPhoneNumber(resultSet.getString(11));
+                reader.setProfilePictureUrl(resultSet.getString(12));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                readersList.add(reader);
+            }
+            return readersList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Reader> searchReadersByName(String userName) throws DatabaseOperationException {
+        try {
+            List<Reader> readersList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader r on u.userId = r.userId " +
+                            "WHERE u.userType = ? AND u.firstName LIKE ? OR u.lastName LIKE ? OR u.userName LIKE ? ORDER BY u.userId DESC"
+            );
+            statement.setString(1, UserType.READER.toString());
+            statement.setString(2, "%"+userName+"%");
+            statement.setString(3, "%"+userName+"%");
+            statement.setString(4,"%"+userName+"%");
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Reader reader = new Reader();
+                reader.setUserId(resultSet.getInt(1));
+                reader.setUserName(resultSet.getString(2));
+                reader.setFirstName(resultSet.getString(3));
+                reader.setLastName(resultSet.getString(4));
+                reader.setEmail(resultSet.getString(6));
+                reader.setAddressLane1(resultSet.getString(7));
+                reader.setAddressLane2(resultSet.getString(8));
+                reader.setCity(resultSet.getString(9));
+                reader.setCountry(resultSet.getString(10));
+                reader.setPhoneNumber(resultSet.getString(11));
+                reader.setProfilePictureUrl(resultSet.getString(12));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                readersList.add(reader);
+            }
+            return readersList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Reader> searchReadersById(int userId) throws DatabaseOperationException {
+        try {
+            List<Reader> readersList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader r on u.userId = r.userId " +
+                            "WHERE u.userType = ? AND u.userId LIKE ? ORDER BY u.userId DESC"
+            );
+            statement.setString(1, UserType.READER.toString());
+            statement.setString(2, "%"+userId+"%");
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+
+                Reader reader = new Reader();
+                reader.setUserId(resultSet.getInt(1));
+                reader.setUserName(resultSet.getString(2));
+                reader.setFirstName(resultSet.getString(3));
+                reader.setLastName(resultSet.getString(4));
+                reader.setEmail(resultSet.getString(6));
+                reader.setAddressLane1(resultSet.getString(7));
+                reader.setAddressLane2(resultSet.getString(8));
+                reader.setCity(resultSet.getString(9));
+                reader.setCountry(resultSet.getString(10));
+                reader.setPhoneNumber(resultSet.getString(11));
+                reader.setProfilePictureUrl(resultSet.getString(12));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                readersList.add(reader);
+            }
+            return readersList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

@@ -1,11 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.Notification;
-import com.fictiontimes.fictiontimesbackend.model.Payout;
-import com.fictiontimes.fictiontimesbackend.model.Writer;
-import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -101,5 +98,17 @@ public class AdminService{
                 new Timestamp(new Date().getTime())
         );
         NotificationUtils.sendNotification(notification);
+    }
+
+    public List<Reader> getReadersList(int limit) throws DatabaseOperationException {
+        return adminRepository.getReadersList(limit);
+    }
+
+    public List<Reader> searchReadersByName(String userName) throws DatabaseOperationException {
+        return adminRepository.searchReadersByName(userName);
+    }
+
+    public List<Reader> searchReadersById(int userId) throws DatabaseOperationException {
+        return adminRepository.searchReadersById(userId);
     }
 }
