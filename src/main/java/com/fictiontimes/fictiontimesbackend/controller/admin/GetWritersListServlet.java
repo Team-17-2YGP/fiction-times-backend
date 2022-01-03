@@ -24,7 +24,7 @@ import java.util.List;
 
 @WebServlet("/admin/writers")
 public class GetWritersListServlet extends HttpServlet {
-    AdminService adminService = new AdminService(new AdminRepository());
+    AdminService adminService = new AdminService(new AdminRepository(), new ReaderRepository());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseOperationException {

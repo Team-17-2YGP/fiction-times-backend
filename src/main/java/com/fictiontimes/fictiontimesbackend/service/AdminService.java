@@ -1,12 +1,12 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.AdminSubscriptionPaymentDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.Notification;
-import com.fictiontimes.fictiontimesbackend.model.Payout;
-import com.fictiontimes.fictiontimesbackend.model.Writer;
-import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
+import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
@@ -14,15 +14,18 @@ import com.fictiontimes.fictiontimesbackend.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class AdminService{
 
     private final AdminRepository adminRepository;
+    private final ReaderRepository readerRepository;
 
-    public AdminService(AdminRepository adminRepository) {
+    public AdminService(AdminRepository adminRepository, ReaderRepository readerRepository) {
         this.adminRepository = adminRepository;
+        this.readerRepository = readerRepository;
     }
 
     public List<WriterApplicant> getApplicantList() throws DatabaseOperationException {
@@ -101,5 +104,39 @@ public class AdminService{
                 new Timestamp(new Date().getTime())
         );
         NotificationUtils.sendNotification(notification);
+    }
+
+    public List<AdminSubscriptionPaymentDTO> getSubscriptionPaymentList(int limit, int offset) throws DatabaseOperationException {
+        List<SubscriptionPayment> paymentList = adminRepository.getSubscriptionPaymentList(limit, offset);
+        List<AdminSubscriptionPaymentDTO> adminSubscriptionPaymentDTO = new ArrayList<>();
+        for(SubscriptionPayment subscriptionPayment : paymentList){
+            adminSubscriptionPaymentDTO.add(new AdminSubscriptionPaymentDTO(subscriptionPayment,
+                        readerRepository.findReaderById(subscriptionPayment.getUserId())));
+        }
+        return adminSubscriptionPaymentDTO;
+    }
+
+    public List<AdminSubscriptionPaymentDTO> searchSubscriptionPayments(String query) throws DatabaseOperationException {
+        List<SubscriptionPayment> paymentList = adminRepository.searchSubscriptionPayments(query);
+        List<AdminSubscriptionPaymentDTO> adminSubscriptionPaymentDTO = new ArrayList<>();
+        for (SubscriptionPayment subscriptionPayment : paymentList) {
+            adminSubscriptionPaymentDTO.add(new AdminSubscriptionPaymentDTO(subscriptionPayment,
+                    readerRepository.findReaderById(subscriptionPayment.getUserId())));
+        }
+        return adminSubscriptionPaymentDTO;
+    }
+
+    public AdminPlatformStatsDTO getPlatformStats() throws DatabaseOperationException {
+        AdminPlatformStatsDTO platformStats = adminRepository.getPlatformStats();
+        platformStats.setTotalUserCount(
+                platformStats.getTotalReaderCount() + platformStats.getTotalWriterCount() +
+                        platformStats.getTotalAdminCount() + platformStats.getTotalApplicantCount());
+        platformStats.setTotalProfitAllTime(
+                platformStats.getTotalSubscriptionPaymentsAllTime() - platformStats.getTotalPayoutsAllTime());
+        platformStats.setTotalProfitThisYear(
+                platformStats.getTotalSubscriptionPaymentsThisYear() - platformStats.getTotalPayoutsThisYear());
+        platformStats.setTotalProfit30Days(
+                platformStats.getTotalSubscriptionPayments30Days() - platformStats.getTotalPayouts30Days());
+        return platformStats;
     }
 }

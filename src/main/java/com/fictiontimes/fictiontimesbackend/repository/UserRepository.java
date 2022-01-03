@@ -11,10 +11,7 @@ import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,8 +24,8 @@ public class UserRepository {
         try {
             statement = DBConnection.getConnection().prepareStatement(
                     "INSERT INTO user (userName, firstName, lastName, password, email, addressLane1, " +
-                            "addressLane2, city, country, phoneNumber, profilePictureUrl, userType, userStatus) " +
-                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "addressLane2, city, country, phoneNumber, profilePictureUrl, userType, userStatus, timestamp) " +
+                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     statement.RETURN_GENERATED_KEYS);
             statement.setString(1, user.getUserName());
             statement.setString(2, user.getFirstName());
@@ -43,6 +40,7 @@ public class UserRepository {
             statement.setString(11, user.getProfilePictureUrl());
             statement.setString(12, user.getUserType().toString());
             statement.setString(13, user.getUserStatus().toString());
+            statement.setObject(14, new Timestamp(new java.util.Date().getTime()));
             // execute the statement
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
