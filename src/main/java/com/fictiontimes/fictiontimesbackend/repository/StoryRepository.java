@@ -396,7 +396,7 @@ public class StoryRepository {
             statement.setString(3, episode.getTitle());
             statement.setString(4, episode.getDescription());
             statement.setInt(5, episode.getReadCount());
-            statement.setDate(6, new Date(episode.getUploadedAt().getTime()));
+            statement.setObject(6, new Timestamp(new java.util.Date().getTime()));
             statement.setString(7, episode.getContent());
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
@@ -434,6 +434,24 @@ public class StoryRepository {
                 ));
             }
             return episodes;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public int getNextEpisodeNumberByStoryId(int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT episodeNumber FROM episode WHERE storyId=? " +
+                            "ORDER BY episodeNumber DESC " +
+                            "LIMIT 1"
+            );
+            statement.setInt(1, storyId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("episodeNumber") + 1;
+            }
+            return 1;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

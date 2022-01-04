@@ -200,4 +200,8 @@ public class StoryService {
         );
         return  episodeDetails;
     }
+
+    public int getNextEpisodeNumberByStoryId(int storyId) throws DatabaseOperationException {
+        return storyRepository.getNextEpisodeNumberByStoryId(storyId);
+    }
 }
