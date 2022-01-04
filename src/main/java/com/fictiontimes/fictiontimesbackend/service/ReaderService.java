@@ -159,4 +159,8 @@ public class ReaderService {
     public void markAsRead(int readerId, int episodeId) throws DatabaseOperationException {
         readerRepository.markAsRead(readerId, episodeId);
     }
+
+    public List<ReaderStoryDTO> getStoryListByGenre(int genreId, int limit) throws DatabaseOperationException {
+        return storyRepository.getStoryListByGenre(genreId, limit);
+    }
 }
