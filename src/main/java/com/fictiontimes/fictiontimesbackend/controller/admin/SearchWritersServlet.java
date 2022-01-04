@@ -3,6 +3,7 @@ package com.fictiontimes.fictiontimesbackend.controller.admin;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
+import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.service.AdminService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @WebServlet("/admin/writers/search")
 public class SearchWritersServlet extends HttpServlet {
-    AdminService adminService = new AdminService(new AdminRepository());
+    AdminService adminService = new AdminService(new AdminRepository(), new ReaderRepository());
     private Object String;
 
     @Override
