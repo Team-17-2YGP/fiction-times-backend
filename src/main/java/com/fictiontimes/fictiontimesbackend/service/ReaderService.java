@@ -13,6 +13,7 @@ import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -43,6 +44,7 @@ public class ReaderService {
     public void verifyReaderSubscription(PayhereNotifyDTO payhereNotifyDTO) throws DatabaseOperationException, IOException {
         User user = userRepository.findUserByEmail(payhereNotifyDTO.getCustom_1());
         readerRepository.verifyReaderSubscription(user.getUserId());
+        readerRepository.saveReaderPaymentDetails(payhereNotifyDTO, user.getUserId());
         logger.info("Sending the email");
         EmailUtils.sendMail(
                 user,
@@ -50,6 +52,11 @@ public class ReaderService {
                 "To continue creating your new fiction times account please verify your email address.",
                 CommonUtils.getDomain() + "/user/activate?token=" + AuthUtils.generateVerificationToken(user)
         );
+    }
+
+    public void saveReaderPaymentDetails(PayhereNotifyDTO payhereNotifyDTO) throws DatabaseOperationException {
+        User user = userRepository.findUserByEmail(payhereNotifyDTO.getCustom_1());
+        readerRepository.saveReaderPaymentDetails(payhereNotifyDTO, user.getUserId());
     }
 
     public List<User> getFollowingWritersList(int userId, int limit) throws DatabaseOperationException {
