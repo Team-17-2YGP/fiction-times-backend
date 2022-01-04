@@ -194,4 +194,28 @@ public class PayhereNotifyDTO {
     public void setCustom_1(String custom_1) {
         this.custom_1 = custom_1;
     }
+
+    @Override
+    public String toString() {
+        return "{ " +
+        " \"merchant_id\": " +  merchant_id + ", \n" +
+        " \"order_id\": " +  order_id + ", \n" +
+        " \"payment_id\": " +  payment_id + ", \n" +
+        " \"subscription_id\": " +  subscription_id + ", \n" +
+        " \"payhere_amount\": " +  payhere_amount + ", \n" +
+        " \"payhere_currency\": " +  payhere_currency + ", \n" +
+        " \"status_code\": " +  status_code + ", \n" +
+        " \"md5sig\": " +  md5sig + ", \n" +
+        " \"method\": " +  method + ", \n" +
+        " \"status_message\": " +  status_message + ", \n" +
+        " \"recurring\": " +  recurring + ", \n" +
+        " \"message_type\": " +  message_type + ", \n" +
+        " \"item_recurrence\": " +  item_recurrence + ", \n" +
+        " \"item_duration\": " +  item_duration + ", \n" +
+        " \"item_rec_status\": " +  item_rec_status + ", \n" +
+        " \"item_rec_date_next\": " +  item_rec_date_next + ", \n" +
+        " \"item_rec_install_paid\": " +  item_rec_install_paid + ", \n" +
+        " \"custom_1\": " +  custom_1 +
+        " }";
+    }
 }

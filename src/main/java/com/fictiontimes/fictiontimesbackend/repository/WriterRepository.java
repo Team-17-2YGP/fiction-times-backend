@@ -45,13 +45,13 @@ public class WriterRepository {
                 writer.setProfilePictureUrl(resultSet.getString(12));
                 writer.setUserType(UserType.valueOf(resultSet.getString(13)));
                 writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                writer.setBusinessAddressLane1(resultSet.getString(16));
-                writer.setBusinessAddressLane2(resultSet.getString(17));
-                writer.setBusinessCity(resultSet.getString(18));
-                writer.setBusinessCountry(resultSet.getString(19));
-                writer.setLandline(resultSet.getString(20));
-                writer.setCurrentBalance(resultSet.getInt(21));
-                writer.setBio(resultSet.getString(22));
+                writer.setBusinessAddressLane1(resultSet.getString(17));
+                writer.setBusinessAddressLane2(resultSet.getString(18));
+                writer.setBusinessCity(resultSet.getString(19));
+                writer.setBusinessCountry(resultSet.getString(20));
+                writer.setLandline(resultSet.getString(21));
+                writer.setCurrentBalance(resultSet.getInt(22));
+                writer.setBio(resultSet.getString(23));
                 return writer;
             }
             return null;

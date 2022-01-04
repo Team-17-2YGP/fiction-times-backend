@@ -18,11 +18,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 @WebServlet("/payhere/notify")
 @MultipartConfig
 public class PayhereNotifyServlet extends HttpServlet {
 
+    private final Logger logger = Logger.getLogger(PayhereNotifyServlet.class.getName());
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(), new WriterRepository());
 
     @Override
@@ -42,11 +44,17 @@ public class PayhereNotifyServlet extends HttpServlet {
         String item_recurrence = request.getParameter("item_recurrence");
         String item_duration = request.getParameter("item_duration");
         int item_rec_status = Integer.parseInt(request.getParameter("item_rec_status"));
-        Date item_rec_date_next = null;
+        Date item_rec_date_next = new Date(); // fallback
         try {
             item_rec_date_next = new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("item_rec_date_next"));
         } catch (ParseException e) {
             e.printStackTrace();
+            try {
+                item_rec_date_next = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter(
+                        "item_rec_date_next"));
+            } catch (ParseException e2) {
+                e2.printStackTrace();
+            }
         }
         int item_rec_install_paid = Integer.parseInt(request.getParameter("item_rec_install_paid"));
         String custom_1 = request.getParameter("custom_1");
@@ -56,14 +64,18 @@ public class PayhereNotifyServlet extends HttpServlet {
                 recurring, message_type, item_recurrence, item_duration,
                 item_rec_status, item_rec_date_next, item_rec_install_paid, custom_1);
         if (PayhereUtils.verifyMD5Sig(notification)) {
+            logger.info("Payhere notify servlet called. Timestamp [ " + new Date() + " ] Data: " + notification);
             switch (notification.getMessage_type()) {
                 case AUTHORIZATION_SUCCESS:
-                        readerService.verifyReaderSubscription(notification);
+                    readerService.verifyReaderSubscription(notification);
                     break;
                 case AUTHORIZATION_FAILED:
+                case RECURRING_INSTALLMENT_SUCCESS:
+                case RECURRING_INSTALLMENT_FAILED:
+                case RECURRING_COMPLETE:
+                case RECURRING_STOPPED:
+                    readerService.saveReaderPaymentDetails(notification);
                     break;
-                default:
-                    // TODO: figure out how to handle other message types
             }
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

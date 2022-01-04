@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.exception.NoSuchObjectFoundException;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayhereFormDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.UserPasswordDTO;
 import com.fictiontimes.fictiontimesbackend.model.Notification;
@@ -127,5 +128,29 @@ public class UserService {
     }
     public void markReadAllNotifications(int userId) throws DatabaseOperationException {
         userRepository.markReadAllNotifications(userId);
+    }
+
+    public void requestPasswordReset(String email) throws DatabaseOperationException, NoSuchObjectFoundException, IOException {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new NoSuchObjectFoundException("Couldn't find a user with the provided email");
+        }
+        String token = AuthUtils.generateAuthToken(user);
+        String link = CommonUtils.getFrontendAddress() + "/resetPassword/?token=" + token;
+        EmailUtils.sendMail(
+                user,
+                "Fiction Times Password Reset",
+                "<p>" +
+                        "Please follow the link below to reset your password" +
+                        "</p>" +
+                        "<p style=\"font-size: 10px\">" +
+                        "Do not share this link with anybody else, specially if you didn't request a password reset" +
+                        "</p>",
+                link
+        );
+    }
+
+    public void resetPassword(User user) throws DatabaseOperationException {
+        userRepository.updatePassword(user.getUserId(), DigestUtils.md5Hex(user.getPassword()));
     }
 }

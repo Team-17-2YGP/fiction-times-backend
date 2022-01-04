@@ -3,6 +3,9 @@ package com.fictiontimes.fictiontimesbackend.repository;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.Types.PayhereMessageType;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
@@ -11,11 +14,10 @@ import com.fictiontimes.fictiontimesbackend.service.WriterService;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AdminRepository {
@@ -188,13 +190,13 @@ public class AdminRepository {
                 writer.setPhoneNumber(resultSet.getString(11));
                 writer.setProfilePictureUrl(resultSet.getString(12));
                 writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                writer.setBusinessAddressLane1(resultSet.getString(16));
-                writer.setBusinessAddressLane2(resultSet.getString(17));
-                writer.setBusinessCity(resultSet.getString(18));
-                writer.setBusinessCountry(resultSet.getString(19));
-                writer.setLandline(resultSet.getString(20));
-                writer.setCurrentBalance(resultSet.getDouble(21));
-                writer.setBio(resultSet.getString(22));
+                writer.setBusinessAddressLane1(resultSet.getString(17));
+                writer.setBusinessAddressLane2(resultSet.getString(18));
+                writer.setBusinessCity(resultSet.getString(19));
+                writer.setBusinessCountry(resultSet.getString(20));
+                writer.setLandline(resultSet.getString(21));
+                writer.setCurrentBalance(resultSet.getDouble(22));
+                writer.setBio(resultSet.getString(23));
                 writerList.add(writer);
             }
             return writerList;
@@ -244,13 +246,13 @@ public class AdminRepository {
                 writer.setPhoneNumber(resultSet.getString(11));
                 writer.setProfilePictureUrl(resultSet.getString(12));
                 writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                writer.setBusinessAddressLane1(resultSet.getString(16));
-                writer.setBusinessAddressLane2(resultSet.getString(17));
-                writer.setBusinessCity(resultSet.getString(18));
-                writer.setBusinessCountry(resultSet.getString(19));
-                writer.setLandline(resultSet.getString(20));
-                writer.setCurrentBalance(resultSet.getDouble(21));
-                writer.setBio(resultSet.getString(22));
+                writer.setBusinessAddressLane1(resultSet.getString(17));
+                writer.setBusinessAddressLane2(resultSet.getString(18));
+                writer.setBusinessCity(resultSet.getString(19));
+                writer.setBusinessCountry(resultSet.getString(20));
+                writer.setLandline(resultSet.getString(21));
+                writer.setCurrentBalance(resultSet.getDouble(22));
+                writer.setBio(resultSet.getString(23));
                 writerList.add(writer);
             }
             return writerList;
@@ -285,13 +287,13 @@ public class AdminRepository {
                 writer.setPhoneNumber(resultSet.getString(11));
                 writer.setProfilePictureUrl(resultSet.getString(12));
                 writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                writer.setBusinessAddressLane1(resultSet.getString(16));
-                writer.setBusinessAddressLane2(resultSet.getString(17));
-                writer.setBusinessCity(resultSet.getString(18));
-                writer.setBusinessCountry(resultSet.getString(19));
-                writer.setLandline(resultSet.getString(20));
-                writer.setCurrentBalance(resultSet.getDouble(21));
-                writer.setBio(resultSet.getString(22));
+                writer.setBusinessAddressLane1(resultSet.getString(17));
+                writer.setBusinessAddressLane2(resultSet.getString(18));
+                writer.setBusinessCity(resultSet.getString(19));
+                writer.setBusinessCountry(resultSet.getString(20));
+                writer.setLandline(resultSet.getString(21));
+                writer.setCurrentBalance(resultSet.getDouble(22));
+                writer.setBio(resultSet.getString(23));
                 writerList.add(writer);
             }
             return writerList;
@@ -348,6 +350,83 @@ public class AdminRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+  
+  public List<SubscriptionPayment> getSubscriptionPaymentList(int limit, int offset) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM subscription_payment " +
+                            "WHERE status=? OR status=? " +
+                            "ORDER BY timestamp DESC " +
+                            "LIMIT ? " +
+                            "OFFSET ? "
+            );
+            statement.setString(1, PayhereMessageType.RECURRING_INSTALLMENT_SUCCESS.toString());
+            statement.setString(2, PayhereMessageType.RECURRING_INSTALLMENT_FAILED.toString());
+            statement.setInt(3, limit);
+            statement.setInt(4, offset);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<SubscriptionPayment> paymentList = new ArrayList<>();
+            while (resultSet.next()) {
+                paymentList.add(new SubscriptionPayment(
+                        resultSet.getInt("subscriptionPaymentId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("paymentId"),
+                        resultSet.getString("subscriptionId"),
+                        resultSet.getFloat("amount"),
+                        resultSet.getString("currency"),
+                        resultSet.getString("paymentMethod"),
+                        PayhereMessageType.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("nextPaymentDate"),
+                        resultSet.getInt("noOfPaymentsReceived"),
+                        resultSet.getTimestamp("timestamp")
+                ));
+            }
+            return paymentList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+  
+  public List<SubscriptionPayment> searchSubscriptionPayments(String query) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM subscription_payment sp INNER JOIN user u ON sp.userId = u.userId " +
+                            "WHERE (sp.status=? OR sp.status=?) AND " +
+                            "(u.userId LIKE ? OR u.firstName LIKE ? OR u.lastName LIKE ? " +
+                            "OR sp.subscriptionPaymentId LIKE ?) " +
+                            "ORDER BY sp.timestamp DESC "
+            );
+            query = "%" + query + "%";
+            statement.setString(1, PayhereMessageType.RECURRING_INSTALLMENT_SUCCESS.toString());
+            statement.setString(2, PayhereMessageType.RECURRING_INSTALLMENT_FAILED.toString());
+            statement.setString(3, query);
+            statement.setString(4, query);
+            statement.setString(5, query);
+            statement.setString(6, query);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<SubscriptionPayment> paymentList = new ArrayList<>();
+            while (resultSet.next()) {
+                paymentList.add(new SubscriptionPayment(
+                        resultSet.getInt("subscriptionPaymentId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("paymentId"),
+                        resultSet.getString("subscriptionId"),
+                        resultSet.getFloat("amount"),
+                        resultSet.getString("currency"),
+                        resultSet.getString("paymentMethod"),
+                        PayhereMessageType.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("nextPaymentDate"),
+                        resultSet.getInt("noOfPaymentsReceived"),
+                        resultSet.getTimestamp(11)
+                ));
+            }
+            return paymentList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 
     public List<Reader> getReadersList(int limit) throws DatabaseOperationException {
         try {
@@ -380,11 +459,11 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+           } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-
+  
     public List<Reader> searchReadersByName(String userName) throws DatabaseOperationException {
         try {
             List<Reader> readersList = new ArrayList<>();
@@ -417,11 +496,11 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+           } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-
+  
     public List<Reader> searchReadersById(int userId) throws DatabaseOperationException {
         try {
             List<Reader> readersList = new ArrayList<>();
@@ -452,6 +531,59 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
+           } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+  
+    public AdminPlatformStatsDTO getPlatformStats() throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT (SELECT COUNT(*) FROM user WHERE userType='READER') as totalReaderCount, " +
+                            "(SELECT COUNT(*) FROM user WHERE userType='WRITER') as totalWriterCount, " +
+                            "(SELECT COUNT(*) FROM user WHERE userType='ADMIN') as totalAdminCount, " +
+                            "(SELECT COUNT(*) FROM user WHERE userType='WRITER_APPLICANT') as totalApplicantCount, " +
+                            "(SELECT COUNT(*) FROM user u WHERE u.userType='WRITER' " +
+                            "   AND u.timestamp > ?) as writerRegistrations30Days, " +
+                            "(SELECT COUNT(*) FROM user u WHERE u.userType='READER' " +
+                            "   AND u.timestamp > ?) as readerRegistrations30Days, " +
+                            "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS') " +
+                            "   as totalSubscriptionPaymentsAllTime, " +
+                            "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS' " +
+                            "   AND timestamp > ?) as totalSubscriptionPaymentsThisYear, " +
+                            "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS' " +
+                            "   AND timestamp > ?) as totalSubscriptionPayments30Days, " +
+                            "(SELECT SUM(amount) FROM payout) as totalPayoutsAllTime, " +
+                            "(SELECT SUM(amount) FROM payout WHERE completedAt > ?) as totalPayoutsThisYear, " +
+                            "(SELECT SUM(amount) FROM payout WHERE completedAt > ?) as totalPayouts30Days "
+            );
+            LocalDateTime now = LocalDateTime.now();
+            Timestamp thisYear = Timestamp.valueOf(LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0));
+            Timestamp last30Days = Timestamp.valueOf(now.minusDays(30));
+            statement.setTimestamp(1, last30Days);
+            statement.setTimestamp(2, last30Days);
+            statement.setTimestamp(3, thisYear);
+            statement.setTimestamp(4, last30Days);
+            statement.setTimestamp(5, thisYear);
+            statement.setTimestamp(6, last30Days);
+
+            ResultSet resultSet = statement.executeQuery();
+            AdminPlatformStatsDTO platformStats = new AdminPlatformStatsDTO();
+            if(resultSet.next()) {
+                platformStats.setTotalReaderCount(resultSet.getInt("totalReaderCount"));
+                platformStats.setTotalWriterCount(resultSet.getInt("totalWriterCount"));
+                platformStats.setTotalAdminCount(resultSet.getInt("totalAdminCount"));
+                platformStats.setTotalApplicantCount(resultSet.getInt("totalApplicantCount"));
+                platformStats.setWriterRegistrations30Days(resultSet.getInt("writerRegistrations30Days"));
+                platformStats.setReaderRegistrations30Days(resultSet.getInt("readerRegistrations30Days"));
+                platformStats.setTotalSubscriptionPaymentsAllTime(resultSet.getDouble("totalSubscriptionPaymentsAllTime"));
+                platformStats.setTotalSubscriptionPaymentsThisYear(resultSet.getDouble("totalSubscriptionPaymentsThisYear"));
+                platformStats.setTotalSubscriptionPayments30Days(resultSet.getDouble("totalSubscriptionPayments30Days"));
+                platformStats.setTotalPayoutsAllTime(resultSet.getDouble("totalPayoutsAllTime"));
+                platformStats.setTotalPayoutsThisYear(resultSet.getDouble("totalPayoutsThisYear"));
+                platformStats.setTotalPayouts30Days(resultSet.getDouble("totalPayouts30Days"));
+            }
+            return platformStats;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

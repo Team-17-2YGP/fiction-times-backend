@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.controller.admin;
 
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
+import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.service.AdminService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.FileUtils;
@@ -22,7 +23,7 @@ public class PayoutServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        adminService = new AdminService(new AdminRepository());
+        adminService = new AdminService(new AdminRepository(), new ReaderRepository());
     }
 
     @Override
