@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.*;
@@ -377,6 +378,84 @@ public class ReaderRepository {
             statement.setInt(2,episodeId);
             statement.setTimestamp(3, new Timestamp(new Date().getTime()));
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<ReaderStoryDTO> getOnLikeRecommendations(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select " +
+                            "distinct story.storyId, story.userId, story.likeCount, story.title, story.description, " +
+                            "story.coverArtUrl, story.status, story.releasedDate, tags " +
+                            "from (story inner join story_genre sg on story.storyId = sg.storyId) " +
+                            "inner join " +
+                            "(select distinct sg.genreId from " +
+                            "(story_like inner join story_genre sg on story_like.storyId = sg.storyId) " +
+                            "where readerId = ?) " +
+                            "as selected on sg.genreId = selected.genreId limit 5"
+            );
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            List<ReaderStoryDTO> storyList = new ArrayList<>();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            StoryRepository storyRepository = new StoryRepository();
+            while (resultSet.next()) {
+                storyList.add(new ReaderStoryDTO(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        storyRepository.getStoryGenreList(resultSet.getInt("storyId"))
+                )));
+            }
+            return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<ReaderStoryDTO> getOnGenreRecommendations(int userId) {
+        return null;
+    }
+
+    public List<ReaderStoryDTO> getOnReadRecommendations(int userId) {
+        return null;
+    }
+
+    public List<ReaderStoryDTO> getStoryListByWriter(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM story WHERE userId = ?"
+            );
+            statement.setInt(1, writerId);
+            ResultSet resultSet = statement.executeQuery();
+            List<ReaderStoryDTO> storyList = new ArrayList<>();
+            Type tagListType = new TypeToken<ArrayList<String>>() {}.getType();
+            StoryRepository storyRepository = new StoryRepository();
+            while (resultSet.next()) {
+                storyList.add(new ReaderStoryDTO(new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        storyRepository.getStoryGenreList(resultSet.getInt("storyId"))
+                )));
+            }
+            return storyList;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

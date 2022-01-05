@@ -163,4 +163,16 @@ public class ReaderService {
     public List<ReaderStoryDTO> getStoryListByGenre(int genreId, int limit) throws DatabaseOperationException {
         return storyRepository.getStoryListByGenre(genreId, limit);
     }
+
+    public ReaderHomeDTO getReaderRecommendations(int userId) throws DatabaseOperationException {
+        return new ReaderHomeDTO(
+                readerRepository.getOnLikeRecommendations(userId),
+                readerRepository.getOnReadRecommendations(userId),
+                readerRepository.getOnGenreRecommendations(userId)
+        );
+    }
+
+    public List<ReaderStoryDTO> getStoryListByWriter(int writerId) throws DatabaseOperationException {
+        return readerRepository.getStoryListByWriter(writerId);
+    }
 }
