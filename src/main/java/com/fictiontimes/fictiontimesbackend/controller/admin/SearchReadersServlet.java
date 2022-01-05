@@ -4,6 +4,7 @@ import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
+import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.service.AdminService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @WebServlet("/admin/readers/search")
 public class SearchReadersServlet extends HttpServlet {
-    AdminService adminService = new AdminService(new AdminRepository());
+    AdminService adminService = new AdminService(new AdminRepository(), new ReaderRepository());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseOperationException {

@@ -2,6 +2,7 @@ package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
+import com.fictiontimes.fictiontimesbackend.model.DTO.BlockReasonDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
@@ -584,6 +585,48 @@ public class AdminRepository {
                 platformStats.setTotalPayouts30Days(resultSet.getDouble("totalPayouts30Days"));
             }
             return platformStats;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void setReasonToBlockUser(BlockReasonDTO reason) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO user_block_reason VALUES (?, ?)"
+            );
+            statement.setInt(1, reason.getUser().getUserId());
+            statement.setString(2, reason.getReason());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public String getReasonToBlockUser(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT reason FROM user_block_reason WHERE userId = ?"
+            );
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String reason = resultSet.getString("reason");
+                return reason;
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void deleteReasonToBlockUser(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "DELETE FROM user_block_reason WHERE userId = ?"
+            );
+            statement.setInt(1, userId);
+            statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

@@ -2,9 +2,7 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
-import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.AdminSubscriptionPaymentDTO;
+import com.fictiontimes.fictiontimesbackend.model.DTO.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
 import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
@@ -152,5 +150,17 @@ public class AdminService{
         platformStats.setTotalProfit30Days(
                 platformStats.getTotalSubscriptionPayments30Days() - platformStats.getTotalPayouts30Days());
         return platformStats;
+    }
+
+    public void setReasonToBlockUser(BlockReasonDTO reason) throws DatabaseOperationException, IOException {
+        adminRepository.setReasonToBlockUser(reason);
+    }
+
+    public String getReasonToBlockUser(int userId) throws DatabaseOperationException, IOException {
+        return adminRepository.getReasonToBlockUser(userId);
+    }
+
+    public void deleteReasonToBlockUser(int userId) throws DatabaseOperationException, IOException {
+        adminRepository.deleteReasonToBlockUser(userId);
     }
 }
