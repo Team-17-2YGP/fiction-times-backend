@@ -541,4 +541,74 @@ public class StoryRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public List<Story> searchStoryById(int storyId) throws DatabaseOperationException {
+        try {
+            List<Story> storyList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM story WHERE storyId LIKE ? ORDER BY storyId DESC "
+            );
+            statement.setString(1, "%"+storyId+"%");
+
+            Type tagListType = new TypeToken<ArrayList<String>>() {
+            }.getType();
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
+                List<Genre> genres = getStoryGenreList(storyId);
+                Story story = new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        tags,
+                        genres
+                );
+                storyList.add(story);
+            }
+            return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<Story> searchStoryByTitle(String storyTitle) throws DatabaseOperationException {
+        try {
+            List<Story> storyList = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM story WHERE title LIKE ? ORDER BY storyId DESC "
+            );
+            statement.setString(1, "%"+storyTitle+"%");
+
+            Type tagListType = new TypeToken<ArrayList<String>>() {
+            }.getType();
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Story story = new Story(
+                        resultSet.getInt("storyId"),
+                        resultSet.getInt("userId"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("likeCount"),
+                        resultSet.getString("coverArtUrl"),
+                        null,
+                        StoryStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("releasedDate"),
+                        CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType),
+                        getStoryGenreList(resultSet.getInt("storyId"))
+                );
+                storyList.add(story);
+            }
+            return storyList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
