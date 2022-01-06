@@ -10,7 +10,6 @@ import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -181,5 +180,17 @@ public class ReaderService {
 
     public List<Genre> getGenreList() throws DatabaseOperationException {
         return genreRepository.getGenreList();
+    }
+
+    public void likeGenre(int userId, List<Integer> genreIdList) throws DatabaseOperationException {
+        readerRepository.likeGenre(userId, genreIdList);
+    }
+
+    public GenreDetailsDTO getGenreDetails(int userId, int genreId) throws DatabaseOperationException {
+        return readerRepository.getGenreDetails(userId, genreId);
+    }
+
+    public void unlikeGenre(int userId, int genreId) throws DatabaseOperationException {
+        readerRepository.unlikeGenre(userId, genreId);
     }
 }

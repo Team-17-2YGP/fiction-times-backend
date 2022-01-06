@@ -9,7 +9,6 @@ import com.google.gson.reflect.TypeToken;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.*;
@@ -460,5 +459,60 @@ public class ReaderRepository {
             )));
         }
         return storyList;
+    }
+
+    public void likeGenre(int userId, List<Integer> genreIdList) throws DatabaseOperationException {
+        try {
+            for (Integer genreId: genreIdList) {
+                statement = DBConnection.getConnection().prepareStatement(
+                        "INSERT INTO genre_like(genreId, readerId) values (?, ?)"
+                );
+                statement.setInt(1, genreId);
+                statement.setInt(2, userId);
+                statement.execute();
+            }
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public GenreDetailsDTO getGenreDetails(int userId, int genreId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select * from genre_like where genreId = ? and readerId = ?"
+            );
+            statement.setInt(1, genreId);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+            boolean isLiked = resultSet.next();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select * from genre where genreId = ?"
+            );
+            statement.setInt(1, genreId);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new GenreDetailsDTO(
+                        genreId,
+                        isLiked,
+                        resultSet.getString("genreName")
+                );
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void unlikeGenre(int userId, int genreId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "delete from genre_like where genreId = ? and readerId = ?"
+            );
+            statement.setInt(1, genreId);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
     }
 }
