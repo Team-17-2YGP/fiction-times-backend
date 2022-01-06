@@ -44,6 +44,7 @@ public class ReaderRepository {
                 reader.setUserType(UserType.valueOf(resultSet.getString("userType")));
                 reader.setUserStatus(UserStatus.valueOf(resultSet.getString("userStatus")));
                 reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString("subscriptionStatus")));
+                reader.setInitialized(resultSet.getBoolean("isInitialized"));
                 return reader;
             }
             return null;
@@ -509,6 +510,19 @@ public class ReaderRepository {
                     "delete from genre_like where genreId = ? and readerId = ?"
             );
             statement.setInt(1, genreId);
+            statement.setInt(2, userId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void initReaderProfile(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "update reader set isInitialized = ? where userId = ?"
+            );
+            statement.setBoolean(1, true);
             statement.setInt(2, userId);
             statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {

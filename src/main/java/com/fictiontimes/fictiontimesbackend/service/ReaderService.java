@@ -8,6 +8,7 @@ import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,6 +185,10 @@ public class ReaderService {
 
     public void likeGenre(int userId, List<Integer> genreIdList) throws DatabaseOperationException {
         readerRepository.likeGenre(userId, genreIdList);
+        Reader reader = getReaderById(userId);
+        if (!reader.isInitialized()) {
+            readerRepository.initReaderProfile(userId);
+        }
     }
 
     public GenreDetailsDTO getGenreDetails(int userId, int genreId) throws DatabaseOperationException {
