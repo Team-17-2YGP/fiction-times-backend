@@ -7,6 +7,7 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
 import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
@@ -22,10 +23,17 @@ public class AdminService{
 
     private final AdminRepository adminRepository;
     private final ReaderRepository readerRepository;
+    private StoryRepository storyRepository;
 
     public AdminService(AdminRepository adminRepository, ReaderRepository readerRepository) {
         this.adminRepository = adminRepository;
         this.readerRepository = readerRepository;
+    }
+
+    public AdminService(AdminRepository adminRepository, ReaderRepository readerRepository, StoryRepository storyRepository) {
+        this.adminRepository = adminRepository;
+        this.readerRepository = readerRepository;
+        this.storyRepository = storyRepository;
     }
 
     public List<WriterApplicant> getApplicantList() throws DatabaseOperationException {
@@ -162,5 +170,39 @@ public class AdminService{
 
     public void deleteReasonToBlockUser(int userId) throws DatabaseOperationException, IOException {
         adminRepository.deleteReasonToBlockUser(userId);
+    }
+
+    public Reader getReaderDetails(int readerId) throws IOException, DatabaseOperationException {
+        return adminRepository.getReaderById(readerId);
+    }
+
+    public Writer getWriterDetails(int writerId) throws IOException, DatabaseOperationException {
+        return adminRepository.getWriterById(writerId);
+    }
+
+    public List<Story> getWriterStoryList(int writerId) throws IOException, DatabaseOperationException {
+        return storyRepository.getStoryListByUserId(writerId);
+    }
+
+    public AdminStoryDTO getStoryDetails(int storyId, int limit, int offset) throws IOException, DatabaseOperationException {
+        AdminStoryDTO adminStory = new AdminStoryDTO();
+
+        adminStory.setStory(storyRepository.getStoryById(storyId));
+        adminStory.setStoryRatingDTO(storyRepository.getStoryRating(storyId));
+        adminStory.setEpisodes(storyRepository.getEpisodeListByStoryId(storyId));
+        adminStory.setStoryReviewDTOS(storyRepository.getStoryReviewList(storyId, limit, offset));
+        return adminStory;
+    }
+
+    public List<Story> getStoryList(int limit) throws DatabaseOperationException {
+        return storyRepository.getRecentlyReleasedStories(limit);
+    }
+
+    public List<Story> searchStoryByTitle(String storyTitle) throws DatabaseOperationException {
+        return storyRepository.searchStoryByTitle(storyTitle);
+    }
+
+    public List<Story> searchStoryById(int storyId) throws DatabaseOperationException {
+        return storyRepository.searchStoryById(storyId);
     }
 }

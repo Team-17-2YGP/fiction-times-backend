@@ -6,12 +6,9 @@ import com.fictiontimes.fictiontimesbackend.model.DTO.BlockReasonDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.Types.PayhereMessageType;
-import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.SubscriptionStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
-import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
+import com.fictiontimes.fictiontimesbackend.model.Types.*;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
+import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -456,7 +453,7 @@ public class AdminRepository {
                 reader.setPhoneNumber(resultSet.getString(11));
                 reader.setProfilePictureUrl(resultSet.getString(12));
                 reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(17)));
                 readersList.add(reader);
             }
             return readersList;
@@ -493,7 +490,7 @@ public class AdminRepository {
                 reader.setPhoneNumber(resultSet.getString(11));
                 reader.setProfilePictureUrl(resultSet.getString(12));
                 reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(17)));
                 readersList.add(reader);
             }
             return readersList;
@@ -528,7 +525,7 @@ public class AdminRepository {
                 reader.setPhoneNumber(resultSet.getString(11));
                 reader.setProfilePictureUrl(resultSet.getString(12));
                 reader.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
-                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(16)));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString(17)));
                 readersList.add(reader);
             }
             return readersList;
@@ -627,6 +624,74 @@ public class AdminRepository {
             );
             statement.setInt(1, userId);
             statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Reader getReaderById(int readerId) throws DatabaseOperationException {
+        try {
+            Reader reader = new Reader();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN reader r on u.userId = r.userId WHERE r.userId = ?"
+            );
+            statement.setInt(1, readerId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                reader.setUserId(resultSet.getInt("userId"));
+                reader.setUserName(resultSet.getString("userName"));
+                reader.setFirstName(resultSet.getString("firstName"));
+                reader.setLastName(resultSet.getString("lastName"));
+                reader.setEmail(resultSet.getString("email"));
+                reader.setAddressLane1(resultSet.getString("addressLane1"));
+                reader.setAddressLane2(resultSet.getString("addressLane2"));
+                reader.setCity(resultSet.getString("city"));
+                reader.setCountry(resultSet.getString("country"));
+                reader.setPhoneNumber(resultSet.getString("phoneNumber"));
+                reader.setProfilePictureUrl(resultSet.getString("profilePictureUrl"));
+                reader.setUserStatus(UserStatus.valueOf(resultSet.getString("userStatus")));
+                reader.setSubscriptionStatus(SubscriptionStatus.valueOf(resultSet.getString("subscriptionStatus")));
+                return reader;
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public Writer getWriterById(int writerId) throws DatabaseOperationException {
+        try {
+            Writer writer = new Writer();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM user u INNER JOIN writer w on u.userId = w.userId WHERE u.userId = ?"
+            );
+            statement.setInt(1, writerId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                writer.setUserId(resultSet.getInt(1));
+                writer.setUserName(resultSet.getString(2));
+                writer.setFirstName(resultSet.getString(3));
+                writer.setLastName(resultSet.getString(4));
+                writer.setEmail(resultSet.getString(6));
+                writer.setAddressLane1(resultSet.getString(7));
+                writer.setAddressLane2(resultSet.getString(8));
+                writer.setCity(resultSet.getString(9));
+                writer.setCountry(resultSet.getString(10));
+                writer.setPhoneNumber(resultSet.getString(11));
+                writer.setProfilePictureUrl(resultSet.getString(12));
+                writer.setUserStatus(UserStatus.valueOf(resultSet.getString(14)));
+                writer.setBusinessAddressLane1(resultSet.getString(17));
+                writer.setBusinessAddressLane2(resultSet.getString(18));
+                writer.setBusinessCity(resultSet.getString(19));
+                writer.setBusinessCountry(resultSet.getString(20));
+                writer.setLandline(resultSet.getString(21));
+                writer.setCurrentBalance(resultSet.getDouble(22));
+                writer.setBio(resultSet.getString(23));
+                return writer;
+            }
+            return null;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
