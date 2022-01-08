@@ -409,9 +409,17 @@ public class ReaderRepository {
             statement = DBConnection.getConnection().prepareStatement(
                     "select distinct story.* from story inner join story_genre sg on story.storyId = sg.storyId " +
                             "where genreId in (select distinct genreId from story_like inner join story_genre sg " +
-                            "on story_like.storyId = sg.storyId where readerId = ?) order by rand() limit 5"
+                            "on story_like.storyId = sg.storyId where readerId = ?) " +
+                            "and story.storyId not in (select distinct story.storyId from story inner join episode e " +
+                            "on story.storyId = e.storyId inner join episode_read er on e.episodeId = er.episodeId " +
+                            "where readerId = ? " +
+                            "union " +
+                            "select distinct storyId from story_like where readerId = ?) " +
+                            "order by rand() limit 5"
             );
             statement.setInt(1, userId);
+            statement.setInt(2, userId);
+            statement.setInt(3, userId);
             return getReaderStoryDTO(statement.executeQuery());
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
@@ -424,7 +432,12 @@ public class ReaderRepository {
                     "select distinct story.* from story inner join story_genre sg on story.storyId = sg.storyId " +
                             "where genreId in (select distinct genreId from episode_read inner join episode e on " +
                             "episode_read.episodeId = e.episodeId inner join story_genre sg on " +
-                            "e.storyId = sg.storyId where readerId = ?) order by rand() limit 5"
+                            "e.storyId = sg.storyId where readerId = ?)" +
+                            "and story.storyId not in (select distinct story.storyId from story inner join episode e " +
+                            "on story.storyId = e.storyId inner join episode_read er on e.episodeId = er.episodeId " +
+                            "where readerId = 145 " +
+                            "union " +
+                            "select distinct storyId from story_like where readerId = 145) order by rand() limit 5"
             );
             statement.setInt(1, userId);
             return getReaderStoryDTO(statement.executeQuery());
@@ -438,6 +451,11 @@ public class ReaderRepository {
             statement = DBConnection.getConnection().prepareStatement(
                     "select distinct story.* from story inner join story_genre sg on story.storyId = sg.storyId " +
                             "where genreId in (select distinct genreId from genre_like where readerId = ?) " +
+                            "and story.storyId not in (select distinct story.storyId from story inner join episode e " +
+                            "on story.storyId = e.storyId inner join episode_read er on e.episodeId = er.episodeId " +
+                            "where readerId = 145 " +
+                            "union " +
+                            "select distinct storyId from story_like where readerId = 145) " +
                             "order by rand() limit 5"
             );
             statement.setInt(1, userId);
