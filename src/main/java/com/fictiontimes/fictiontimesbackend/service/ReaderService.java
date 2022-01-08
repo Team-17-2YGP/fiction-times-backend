@@ -3,17 +3,14 @@ package com.fictiontimes.fictiontimesbackend.service;
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.*;
-import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
-import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
-import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
-import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
+import com.fictiontimes.fictiontimesbackend.repository.*;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -23,6 +20,7 @@ public class ReaderService {
     private ReaderRepository readerRepository;
     private WriterRepository writerRepository;
     private StoryRepository storyRepository;
+    private GenreRepository genreRepository;
 
     public ReaderService(UserRepository userRepository, ReaderRepository readerRepository, WriterRepository writerRepository) {
         this.userRepository = userRepository;
@@ -35,6 +33,15 @@ public class ReaderService {
         this.readerRepository = readerRepository;
         this.writerRepository = writerRepository;
         this.storyRepository = storyRepository;
+    }
+
+    public ReaderService(UserRepository userRepository, ReaderRepository readerRepository,
+                         WriterRepository writerRepository, StoryRepository storyRepository, GenreRepository genreRepository) {
+        this.userRepository = userRepository;
+        this.readerRepository = readerRepository;
+        this.writerRepository = writerRepository;
+        this.storyRepository = storyRepository;
+        this.genreRepository = genreRepository;
     }
 
     public Reader getReaderById(int readerId) throws DatabaseOperationException {
@@ -158,5 +165,37 @@ public class ReaderService {
 
     public void markAsRead(int readerId, int episodeId) throws DatabaseOperationException {
         readerRepository.markAsRead(readerId, episodeId);
+    }
+
+    public List<ReaderStoryDTO> getStoryListByGenre(int genreId, int limit) throws DatabaseOperationException {
+        return storyRepository.getStoryListByGenre(genreId, limit);
+    }
+
+    public ReaderHomeDTO getReaderRecommendations(int userId) throws DatabaseOperationException {
+        return readerRepository.getReaderRecommendations(userId);
+    }
+
+    public List<ReaderStoryDTO> getStoryListByWriter(int writerId) throws DatabaseOperationException {
+        return readerRepository.getStoryListByWriter(writerId);
+    }
+
+    public List<Genre> getGenreList() throws DatabaseOperationException {
+        return genreRepository.getGenreList();
+    }
+
+    public void likeGenre(int userId, List<Integer> genreIdList) throws DatabaseOperationException {
+        readerRepository.likeGenre(userId, genreIdList);
+        Reader reader = getReaderById(userId);
+        if (!reader.isInitialized()) {
+            readerRepository.initReaderProfile(userId);
+        }
+    }
+
+    public GenreDetailsDTO getGenreDetails(int userId, int genreId) throws DatabaseOperationException {
+        return readerRepository.getGenreDetails(userId, genreId);
+    }
+
+    public void unlikeGenre(int userId, int genreId) throws DatabaseOperationException {
+        readerRepository.unlikeGenre(userId, genreId);
     }
 }
