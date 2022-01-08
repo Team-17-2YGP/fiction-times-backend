@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.model.Auth.TokenBody;
 import com.fictiontimes.fictiontimesbackend.model.Reader;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
@@ -23,7 +24,7 @@ import java.io.IOException;
 public class UpdateProfileDetailsServlet extends HttpServlet {
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(),
             new WriterRepository());
-    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
+    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException,

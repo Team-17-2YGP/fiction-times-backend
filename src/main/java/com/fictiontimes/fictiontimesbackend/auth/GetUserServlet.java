@@ -9,10 +9,7 @@ import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
-import com.fictiontimes.fictiontimesbackend.repository.ApplicantRepository;
-import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
-import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
-import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
+import com.fictiontimes.fictiontimesbackend.repository.*;
 import com.fictiontimes.fictiontimesbackend.service.ApplicantService;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 import com.fictiontimes.fictiontimesbackend.service.UserService;
@@ -32,7 +29,7 @@ public class GetUserServlet extends HttpServlet {
     UserService userService = new UserService(new UserRepository());
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(),
             new WriterRepository());
-    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
+    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
     ApplicantService applicantService = new ApplicantService(new ApplicantRepository(new UserRepository()));
 
     @Override

@@ -2,11 +2,10 @@ package com.fictiontimes.fictiontimesbackend.service;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
 import com.fictiontimes.fictiontimesbackend.exception.UnauthorizedActionException;
-import com.fictiontimes.fictiontimesbackend.model.Notification;
-import com.fictiontimes.fictiontimesbackend.model.Payout;
+import com.fictiontimes.fictiontimesbackend.model.*;
+import com.fictiontimes.fictiontimesbackend.model.DTO.WriterStatsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
-import com.fictiontimes.fictiontimesbackend.model.User;
-import com.fictiontimes.fictiontimesbackend.model.Writer;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -21,10 +20,12 @@ import java.util.List;
 public class WriterService {
     WriterRepository writerRepository;
     UserRepository userRepository;
+    StoryRepository storyRepository;
 
-    public WriterService(WriterRepository writerRepository, UserRepository userRepository) {
+    public WriterService(WriterRepository writerRepository, UserRepository userRepository, StoryRepository storyRepository) {
         this.writerRepository = writerRepository;
         this.userRepository = userRepository;
+        this.storyRepository = storyRepository;
     }
 
     public Writer getWriterById(int writerId) throws DatabaseOperationException {
@@ -115,5 +116,12 @@ public class WriterService {
             throw new UnauthorizedActionException("Can't access the requested payout");
         }
         return payout;
+    }
+
+    public WriterStatsDTO getStats(int writerId) throws DatabaseOperationException {
+        WriterStatsDTO stats =  writerRepository.getStats(writerId);
+        List<Story> stories = storyRepository.getStoryListByUserId(writerId);
+        stats.setStories(stories);
+        return stats;
     }
 }

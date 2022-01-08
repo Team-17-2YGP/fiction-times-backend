@@ -145,6 +145,7 @@ public class StoryRepository {
                         tags,
                         genres
                 );
+                story.setReadCount(getReadCountByStoryId(storyId));
                 storyList.add(story);
             }
             return storyList;
@@ -189,7 +190,7 @@ public class StoryRepository {
                 List<String> tags = CommonUtils.getGson().fromJson(resultSet.getString("tags"), tagListType);
                 List<Genre> genres = getStoryGenreList(storyId);
                 StoryRatingDTO rating = getStoryRating(storyId);
-                return new Story(
+                Story story =  new Story(
                         storyId,
                         resultSet.getInt("userId"),
                         resultSet.getString("title"),
@@ -204,6 +205,8 @@ public class StoryRepository {
                         rating.getReviewerCount(),
                         rating.getAverageRating()
                 );
+                story.setReadCount(getReadCountByStoryId(storyId));
+                return story;
             }
             return null;
         } catch (SQLException | IOException | ClassNotFoundException e) {
@@ -658,6 +661,22 @@ public class StoryRepository {
                 ));
             }
             return readerStoryDTOList;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public int getReadCountByStoryId(int storyId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT COUNT(*) FROM  episode_read er INNER JOIN episode e " +
+                            "ON er.episodeId = e.episodeId WHERE e.storyId = ?"
+            );
+            statement.setInt(1, storyId);
+
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) return resultSet.getInt(1);
+            return 0;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
