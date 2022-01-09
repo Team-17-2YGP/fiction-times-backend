@@ -305,7 +305,7 @@ public class AdminRepository {
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT * FROM payout ORDER BY status DESC, requestedAt"
             );
-            WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
+            WriterService writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
             ResultSet resultSet = statement.executeQuery();
             List<PayoutAdminDTO> payoutList = new ArrayList<>();
             while (resultSet.next()) {

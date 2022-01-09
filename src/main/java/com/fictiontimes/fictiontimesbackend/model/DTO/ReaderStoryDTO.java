@@ -5,6 +5,7 @@ import com.fictiontimes.fictiontimesbackend.model.Genre;
 import com.fictiontimes.fictiontimesbackend.model.Story;
 import com.fictiontimes.fictiontimesbackend.model.Types.StoryStatus;
 import com.fictiontimes.fictiontimesbackend.model.Writer;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
@@ -28,7 +29,7 @@ public class ReaderStoryDTO {
     private boolean isLiked;
 
     public ReaderStoryDTO(Story story) throws DatabaseOperationException {
-        WriterService writerService = new WriterService(new WriterRepository(), new UserRepository());
+        WriterService writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
         this.storyId = story.getStoryId();
         this.writer = writerService.getWriterById(story.getUserId());
         this.title = story.getTitle();

@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.controller.writer;
 
 import com.fictiontimes.fictiontimesbackend.model.Payout;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
@@ -21,7 +22,7 @@ public class PayoutRequestServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        writerService = new WriterService(new WriterRepository(), new UserRepository());
+        writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
     }
 
     @Override

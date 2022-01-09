@@ -20,6 +20,7 @@ public class Story {
     private List<Genre> genres;
     private int reviewerCount;
     private float averageRating;
+    private int readCount;
 
     public Story(int storyId, int userId, String title, String description, int likeCount, String coverArtUrl,
                  Part coverArt, StoryStatus status,
@@ -155,5 +156,13 @@ public class Story {
 
     public void setAverageRating(float averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public int getReadCount() {
+        return readCount;
+    }
+
+    public void setReadCount(int readCount) {
+        this.readCount = readCount;
     }
 }

@@ -378,6 +378,12 @@ public class ReaderRepository {
             statement.setInt(2,episodeId);
             statement.setTimestamp(3, new Timestamp(new Date().getTime()));
             statement.execute();
+
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE episode SET readCount=readCount+1 WHERE episodeId=?"
+            );
+            statement.setInt(1,episodeId);
+            statement.execute();
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

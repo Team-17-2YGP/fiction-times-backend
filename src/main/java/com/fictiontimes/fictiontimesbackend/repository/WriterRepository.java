@@ -1,6 +1,7 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.DTO.WriterStatsDTO;
 import com.fictiontimes.fictiontimesbackend.model.Payout;
 import com.fictiontimes.fictiontimesbackend.model.Types.PayoutStatus;
 import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
@@ -12,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -236,6 +238,87 @@ public class WriterRepository {
                 return resultSet.getLong("totalDuration");
             }
             return 0;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public WriterStatsDTO getStats(int writerId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT (SELECT COUNT(*) FROM reader_following WHERE writerId=?) AS followersAllTime, " +
+                            "(SELECT COUNT(*) FROM reader_following WHERE writerId=? " +
+                            "   AND timestamp > ?) AS followersLastYear, " +
+                            "(SELECT COUNT(*) FROM reader_following WHERE writerId=? " +
+                            "   AND timestamp > ?) AS followers30Days, " +
+                            "(SELECT COUNT(*) FROM reader_following WHERE writerId=? " +
+                            "   AND timestamp > ?) AS followers7Days, " +
+                            "(SELECT COUNT(*) FROM story_like sl INNER JOIN story s ON sl.storyId = s.storyId " +
+                            "   WHERE s.userId=?) AS likesAllTime, " +
+                            "(SELECT COUNT(*) FROM story_like sl INNER JOIN story s ON sl.storyId = s.storyId " +
+                            "   WHERE s.userId=? AND sl.timestamp > ?) AS likesLastYear, " +
+                            "(SELECT COUNT(*) FROM story_like sl INNER JOIN story s ON sl.storyId = s.storyId " +
+                            "   WHERE s.userId=? AND sl.timestamp > ?) AS likes30Days, " +
+                            "(SELECT COUNT(*) FROM story_like sl INNER JOIN story s ON sl.storyId = s.storyId " +
+                            "   WHERE s.userId=? AND sl.timestamp > ?) AS likes7Days, " +
+                            "(SELECT COUNT(*) FROM episode_read er INNER JOIN episode e INNER JOIN story s " +
+                            "   ON er.episodeId=e.episodeId AND e.storyId =s.storyId " +
+                            "   WHERE s.userId=?) AS readCountAllTime, " +
+                            "(SELECT COUNT(*) FROM episode_read er INNER JOIN episode e INNER JOIN story s " +
+                            "   ON er.episodeId=e.episodeId AND e.storyId =s.storyId " +
+                            "   WHERE s.userId=? AND er.timestamp > ?) AS readCountLastYear, " +
+                            "(SELECT COUNT(*) FROM episode_read er INNER JOIN episode e INNER JOIN story s " +
+                            "   ON er.episodeId=e.episodeId AND e.storyId =s.storyId " +
+                            "   WHERE s.userId=? AND er.timestamp > ?) AS readCount30Days, " +
+                            "(SELECT COUNT(*) FROM episode_read er INNER JOIN episode e INNER JOIN story s " +
+                            "   ON er.episodeId=e.episodeId AND e.storyId =s.storyId " +
+                            "   WHERE s.userId=? AND er.timestamp > ?) AS readCount7Days "
+            );
+            LocalDateTime now = LocalDateTime.now();
+            Timestamp lastYear = Timestamp.valueOf(LocalDateTime.of(now.getYear() -1, 1, 1, 0, 0, 0));
+            Timestamp last30Days = Timestamp.valueOf(now.minusDays(30));
+            Timestamp last7Days = Timestamp.valueOf(now.minusDays(7));
+
+            statement.setInt(1, writerId);
+            statement.setInt(2, writerId);
+            statement.setTimestamp(3, lastYear);
+            statement.setInt(4, writerId);
+            statement.setTimestamp(5, last30Days);
+            statement.setInt(6, writerId);
+            statement.setTimestamp(7, last7Days);
+            statement.setInt(8, writerId);
+            statement.setInt(9, writerId);
+            statement.setTimestamp(10, lastYear);
+            statement.setInt(11, writerId);
+            statement.setTimestamp(12, last30Days);
+            statement.setInt(13, writerId);
+            statement.setTimestamp(14, last7Days);
+            statement.setInt(15, writerId);
+            statement.setInt(16, writerId);
+            statement.setTimestamp(17, lastYear);
+            statement.setInt(18, writerId);
+            statement.setTimestamp(19, last30Days);
+            statement.setInt(20, writerId);
+            statement.setTimestamp(21, last7Days);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new WriterStatsDTO(
+                        resultSet.getInt("followersAllTime"),
+                        resultSet.getInt("followersLastYear"),
+                        resultSet.getInt("followers30Days"),
+                        resultSet.getInt("followers7Days"),
+                        resultSet.getInt("likesAllTime"),
+                        resultSet.getInt("likesLastYear"),
+                        resultSet.getInt("likes30Days"),
+                        resultSet.getInt("likes7Days"),
+                        resultSet.getInt("readCountAllTime"),
+                        resultSet.getInt("readCountLastYear"),
+                        resultSet.getInt("readCount30Days"),
+                        resultSet.getInt("readCount7Days")
+                );
+            }
+            return null;
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }

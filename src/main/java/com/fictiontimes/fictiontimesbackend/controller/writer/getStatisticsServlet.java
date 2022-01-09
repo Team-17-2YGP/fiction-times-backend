@@ -14,25 +14,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/writer/payouts")
-public class PayoutServlet extends HttpServlet {
+@WebServlet("/writer/stats")
+public class getStatisticsServlet extends HttpServlet {
 
-    WriterService writerService;
-
-    @Override
-    public void init() throws ServletException {
-        writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
-    }
+    WriterService writerService = new WriterService(new WriterRepository(), new UserRepository(), new StoryRepository());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String queryParam = request.getParameter("id");
-        int writerId = AuthUtils.getUserId(request.getHeader("Authorization"));
-        if (queryParam == null) {
-            response.getWriter().write(CommonUtils.getGson().toJson(writerService.getPayoutList(writerId)));
-        } else {
-            int payoutId = Integer.parseInt(queryParam);
-            response.getWriter().write(CommonUtils.getGson().toJson(writerService.getPayoutById(payoutId, writerId)));
-        }
+        int userId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
+        response.getWriter().write(CommonUtils.getGson().toJson(writerService.getStats(userId)));
     }
 }
