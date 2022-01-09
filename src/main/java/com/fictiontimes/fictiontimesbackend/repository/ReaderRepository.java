@@ -435,11 +435,13 @@ public class ReaderRepository {
                             "e.storyId = sg.storyId where readerId = ?)" +
                             "and story.storyId not in (select distinct story.storyId from story inner join episode e " +
                             "on story.storyId = e.storyId inner join episode_read er on e.episodeId = er.episodeId " +
-                            "where readerId = 145 " +
+                            "where readerId = ? " +
                             "union " +
-                            "select distinct storyId from story_like where readerId = 145) order by rand() limit 5"
+                            "select distinct storyId from story_like where readerId = ?) order by rand() limit 5"
             );
             statement.setInt(1, userId);
+            statement.setInt(2, userId);
+            statement.setInt(3, userId);
             return getReaderStoryDTO(statement.executeQuery());
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
@@ -453,12 +455,14 @@ public class ReaderRepository {
                             "where genreId in (select distinct genreId from genre_like where readerId = ?) " +
                             "and story.storyId not in (select distinct story.storyId from story inner join episode e " +
                             "on story.storyId = e.storyId inner join episode_read er on e.episodeId = er.episodeId " +
-                            "where readerId = 145 " +
+                            "where readerId = ? " +
                             "union " +
-                            "select distinct storyId from story_like where readerId = 145) " +
+                            "select distinct storyId from story_like where readerId = ?) " +
                             "order by rand() limit 5"
             );
             statement.setInt(1, userId);
+            statement.setInt(2, userId);
+            statement.setInt(3, userId);
             return getReaderStoryDTO(statement.executeQuery());
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
