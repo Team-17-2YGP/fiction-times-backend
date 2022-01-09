@@ -21,7 +21,7 @@ public class AuthUtils {
     public static String generateAuthToken(User user) {
         String token;
         TokenBody tokenBody = new TokenBody(user.getUserId(), user.getUserType(), user.getUserStatus(),
-                new Date(new Date().getTime() + 1800000));
+                new Date(new Date().getTime() + 21600000)); // Expires in 6 hours from now
         String base64Body = Base64.getEncoder().encodeToString(CommonUtils.getGson().toJson(tokenBody).getBytes());
         token = base64Body + "." + DigestUtils.sha256Hex(base64Body + secret);
         return token;

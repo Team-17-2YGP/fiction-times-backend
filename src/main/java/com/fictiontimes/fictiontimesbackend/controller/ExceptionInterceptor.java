@@ -25,6 +25,7 @@ public class ExceptionInterceptor implements Filter {
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Token is expired, please login to continue\"}");
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\" }");

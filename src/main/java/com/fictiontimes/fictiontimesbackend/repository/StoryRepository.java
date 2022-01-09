@@ -413,6 +413,35 @@ public class StoryRepository {
         }
     }
 
+    public void updateEpisode(Episode episode) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "UPDATE episode SET title=?, description=?, content=? WHERE episodeId=?"
+            );
+
+            statement.setString(1, episode.getTitle());
+            statement.setString(2, episode.getDescription());
+            statement.setString(3, episode.getContent());
+            statement.setInt(4, episode.getEpisodeId());
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void deleteEpisode(int episodeId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "DELETE FROM episode WHERE episodeId = ?"
+            );
+
+            statement.setInt(1, episodeId);
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     public List<Episode> getEpisodeListByStoryId(int storyId) throws DatabaseOperationException {
         try {
             List<Episode> episodes = new ArrayList<>();
