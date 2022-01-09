@@ -22,11 +22,13 @@ public class ReasonToBlockUserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int userId = Integer.parseInt(request.getParameter("id"));
-        BlockReasonDTO reason = CommonUtils.getGson().fromJson(request.getReader(), BlockReasonDTO.class);
+        String reason = request.getParameter("reason");
+        BlockReasonDTO blockReasonDTO = new BlockReasonDTO();
         User user = new User();
         user.setUserId(userId);
-        reason.setUser(user);
-        adminService.setReasonToBlockUser(reason);
+        blockReasonDTO.setReason(reason);
+        blockReasonDTO.setUser(user);
+        adminService.setReasonToBlockUser(blockReasonDTO);
     }
 
     @Override
