@@ -548,21 +548,21 @@ public class AdminRepository {
                             "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS') " +
                             "   as totalSubscriptionPaymentsAllTime, " +
                             "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS' " +
-                            "   AND timestamp > ?) as totalSubscriptionPaymentsThisYear, " +
+                            "   AND timestamp > ?) as totalSubscriptionPaymentsLastYear, " +
                             "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS' " +
                             "   AND timestamp > ?) as totalSubscriptionPayments30Days, " +
                             "(SELECT SUM(amount) FROM payout) as totalPayoutsAllTime, " +
-                            "(SELECT SUM(amount) FROM payout WHERE completedAt > ?) as totalPayoutsThisYear, " +
+                            "(SELECT SUM(amount) FROM payout WHERE completedAt > ?) as totalPayoutsLastYear, " +
                             "(SELECT SUM(amount) FROM payout WHERE completedAt > ?) as totalPayouts30Days "
             );
             LocalDateTime now = LocalDateTime.now();
-            Timestamp thisYear = Timestamp.valueOf(LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0));
+            Timestamp lastYear = Timestamp.valueOf(LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0));
             Timestamp last30Days = Timestamp.valueOf(now.minusDays(30));
             statement.setTimestamp(1, last30Days);
             statement.setTimestamp(2, last30Days);
-            statement.setTimestamp(3, thisYear);
+            statement.setTimestamp(3, lastYear);
             statement.setTimestamp(4, last30Days);
-            statement.setTimestamp(5, thisYear);
+            statement.setTimestamp(5, lastYear);
             statement.setTimestamp(6, last30Days);
 
             ResultSet resultSet = statement.executeQuery();
@@ -575,10 +575,11 @@ public class AdminRepository {
                 platformStats.setWriterRegistrations30Days(resultSet.getInt("writerRegistrations30Days"));
                 platformStats.setReaderRegistrations30Days(resultSet.getInt("readerRegistrations30Days"));
                 platformStats.setTotalSubscriptionPaymentsAllTime(resultSet.getDouble("totalSubscriptionPaymentsAllTime"));
-                platformStats.setTotalSubscriptionPaymentsThisYear(resultSet.getDouble("totalSubscriptionPaymentsThisYear"));
+                platformStats.setTotalSubscriptionPaymentsLastYear(resultSet.getDouble(
+                        "totalSubscriptionPaymentsLastYear"));
                 platformStats.setTotalSubscriptionPayments30Days(resultSet.getDouble("totalSubscriptionPayments30Days"));
                 platformStats.setTotalPayoutsAllTime(resultSet.getDouble("totalPayoutsAllTime"));
-                platformStats.setTotalPayoutsThisYear(resultSet.getDouble("totalPayoutsThisYear"));
+                platformStats.setTotalPayoutsLastYear(resultSet.getDouble("totalPayoutsLastYear"));
                 platformStats.setTotalPayouts30Days(resultSet.getDouble("totalPayouts30Days"));
             }
             return platformStats;

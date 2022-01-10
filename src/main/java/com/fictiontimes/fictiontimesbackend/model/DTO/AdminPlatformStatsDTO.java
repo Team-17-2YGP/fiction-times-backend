@@ -9,13 +9,13 @@ public class AdminPlatformStatsDTO {
     private int writerRegistrations30Days;
     private int readerRegistrations30Days;
     private double totalSubscriptionPaymentsAllTime;
-    private double totalSubscriptionPaymentsThisYear;
+    private double totalSubscriptionPaymentsLastYear;
     private double totalSubscriptionPayments30Days;
     private double totalPayoutsAllTime;
-    private double totalPayoutsThisYear;
+    private double totalPayoutsLastYear;
     private double totalPayouts30Days;
     private double totalProfitAllTime;
-    private double totalProfitThisYear;
+    private double totalProfitLastYear;
     private double totalProfit30Days;
 
     public AdminPlatformStatsDTO() {
@@ -23,9 +23,9 @@ public class AdminPlatformStatsDTO {
 
     public AdminPlatformStatsDTO(int totalReaderCount, int totalWriterCount, int totalAdminCount, int totalApplicantCount,
                                  int totalUserCount, int writerRegistrations30Days, int readerRegistrations30Days,
-                                 double totalSubscriptionPaymentsAllTime, double totalSubscriptionPaymentsThisYear,
-                                 double totalSubscriptionPayments30Days, double totalPayoutsAllTime, double totalPayoutsThisYear,
-                                 double totalPayouts30Days, double totalProfitAllTime, double totalProfitThisYear,
+                                 double totalSubscriptionPaymentsAllTime, double totalSubscriptionPaymentsLastYear,
+                                 double totalSubscriptionPayments30Days, double totalPayoutsAllTime, double totalPayoutsLastYear,
+                                 double totalPayouts30Days, double totalProfitAllTime, double totalProfitLastYear,
                                  double totalProfit30Days) {
         this.totalReaderCount = totalReaderCount;
         this.totalWriterCount = totalWriterCount;
@@ -35,13 +35,13 @@ public class AdminPlatformStatsDTO {
         this.writerRegistrations30Days = writerRegistrations30Days;
         this.readerRegistrations30Days = readerRegistrations30Days;
         this.totalSubscriptionPaymentsAllTime = totalSubscriptionPaymentsAllTime;
-        this.totalSubscriptionPaymentsThisYear = totalSubscriptionPaymentsThisYear;
+        this.totalSubscriptionPaymentsLastYear = totalSubscriptionPaymentsLastYear;
         this.totalSubscriptionPayments30Days = totalSubscriptionPayments30Days;
         this.totalPayoutsAllTime = totalPayoutsAllTime;
-        this.totalPayoutsThisYear = totalPayoutsThisYear;
+        this.totalPayoutsLastYear = totalPayoutsLastYear;
         this.totalPayouts30Days = totalPayouts30Days;
         this.totalProfitAllTime = totalProfitAllTime;
-        this.totalProfitThisYear = totalProfitThisYear;
+        this.totalProfitLastYear = totalProfitLastYear;
         this.totalProfit30Days = totalProfit30Days;
     }
 
@@ -109,12 +109,12 @@ public class AdminPlatformStatsDTO {
         this.totalSubscriptionPaymentsAllTime = totalSubscriptionPaymentsAllTime;
     }
 
-    public double getTotalSubscriptionPaymentsThisYear() {
-        return totalSubscriptionPaymentsThisYear;
+    public double getTotalSubscriptionPaymentsLastYear() {
+        return totalSubscriptionPaymentsLastYear;
     }
 
-    public void setTotalSubscriptionPaymentsThisYear(double totalSubscriptionPaymentsThisYear) {
-        this.totalSubscriptionPaymentsThisYear = totalSubscriptionPaymentsThisYear;
+    public void setTotalSubscriptionPaymentsLastYear(double totalSubscriptionPaymentsLastYear) {
+        this.totalSubscriptionPaymentsLastYear = totalSubscriptionPaymentsLastYear;
     }
 
     public double getTotalSubscriptionPayments30Days() {
@@ -133,12 +133,12 @@ public class AdminPlatformStatsDTO {
         this.totalPayoutsAllTime = totalPayoutsAllTime;
     }
 
-    public double getTotalPayoutsThisYear() {
-        return totalPayoutsThisYear;
+    public double getTotalPayoutsLastYear() {
+        return totalPayoutsLastYear;
     }
 
-    public void setTotalPayoutsThisYear(double totalPayoutsThisYear) {
-        this.totalPayoutsThisYear = totalPayoutsThisYear;
+    public void setTotalPayoutsLastYear(double totalPayoutsLastYear) {
+        this.totalPayoutsLastYear = totalPayoutsLastYear;
     }
 
     public double getTotalPayouts30Days() {
@@ -157,12 +157,12 @@ public class AdminPlatformStatsDTO {
         this.totalProfitAllTime = totalProfitAllTime;
     }
 
-    public double getTotalProfitThisYear() {
-        return totalProfitThisYear;
+    public double getTotalProfitLastYear() {
+        return totalProfitLastYear;
     }
 
-    public void setTotalProfitThisYear(double totalProfitThisYear) {
-        this.totalProfitThisYear = totalProfitThisYear;
+    public void setTotalProfitLastYear(double totalProfitLastYear) {
+        this.totalProfitLastYear = totalProfitLastYear;
     }
 
     public double getTotalProfit30Days() {

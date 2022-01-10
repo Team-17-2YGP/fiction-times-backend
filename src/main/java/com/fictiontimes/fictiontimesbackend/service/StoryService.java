@@ -179,6 +179,53 @@ public class StoryService {
         NotificationUtils.sendNotificationBulk(subscribedReaders, notification);
     }
 
+    public void updateEpisode(Episode episode, int userId) throws ServletException {
+        Story story = getStoryById(episode.getStoryId());
+        if (story == null) {
+            throw new NoSuchObjectFoundException("Story object by the received story id doesn't exist");
+        }
+        if(story.getUserId() != userId){
+            throw new UnauthorizedActionException("Story does not belong to the user");
+        }
+        if(episode.getContent() == null){
+            episode.setContent(storyRepository.getEpisodeContentByEpisodeId(episode.getEpisodeId()));
+        }
+        storyRepository.updateEpisode(episode);
+
+        User writer = userRepository.findUserByUserId(story.getUserId());
+        List<User> subscribedReaders = userRepository.getNotificationsSubscribedReadersByWriterId(userId);
+        EmailUtils.sendEmailBulk(
+                subscribedReaders,
+                episode.getTitle() + " just got updated",
+                writer.getFirstName() + " " +writer.getLastName() + " just updated the episode: "+ episode.getTitle() + " of " +
+                        story.getTitle() + " <br>" +
+                        "Click below to check it out: ",
+                CommonUtils.getFrontendAddress() + "/reader/?episodeID=" + episode.getEpisodeId()
+        );
+
+        Notification notification = new Notification(
+                0,
+                0,
+                "Updated episode: " + episode.getTitle(),
+                story.getTitle() + " . " + writer.getFirstName() + " " + writer.getLastName(),
+                "/reader/?episodeID=" + episode.getEpisodeId(),
+                false,
+                new Timestamp(new Date().getTime())
+        );
+        NotificationUtils.sendNotificationBulk(subscribedReaders, notification);
+    }
+
+    public void deleteEpisode(int episodeId, int storyId, int userId) throws ServletException {
+        Story story = getStoryById(storyId);
+        if (story == null) {
+            throw new NoSuchObjectFoundException("Story object by the received story id doesn't exist");
+        }
+        if(story.getUserId() != userId){
+            throw new UnauthorizedActionException("Story does not belong to the user");
+        }
+        storyRepository.deleteEpisode(episodeId);
+    }
+
     public String getEpisodeContentByEpisodeId(int episodeId) throws DatabaseOperationException{
         return storyRepository.getEpisodeContentByEpisodeId(episodeId);
     }
@@ -199,6 +246,16 @@ public class StoryService {
                 storyRepository.getStoryById(episode.getStoryId())
         );
         return  episodeDetails;
+    }
+
+    /** Check if the episode belong to the writer and return the episode details */
+    public Episode getEpisodeById(int episodeId, int writerId) throws ServletException {
+        Episode episode = storyRepository.getEpisodeById(episodeId);
+        Story story = getStoryById(episode.getStoryId(), writerId);
+        if(story == null){
+            throw new UnauthorizedActionException("Episode does not belong to the user");
+        }
+        return episode;
     }
 
     public int getNextEpisodeNumberByStoryId(int storyId) throws DatabaseOperationException {

@@ -4,7 +4,6 @@ import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException
 import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.*;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.repository.AdminRepository;
 import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
@@ -153,8 +152,8 @@ public class AdminService{
                         platformStats.getTotalAdminCount() + platformStats.getTotalApplicantCount());
         platformStats.setTotalProfitAllTime(
                 platformStats.getTotalSubscriptionPaymentsAllTime() - platformStats.getTotalPayoutsAllTime());
-        platformStats.setTotalProfitThisYear(
-                platformStats.getTotalSubscriptionPaymentsThisYear() - platformStats.getTotalPayoutsThisYear());
+        platformStats.setTotalProfitLastYear(
+                platformStats.getTotalSubscriptionPaymentsLastYear() - platformStats.getTotalPayoutsLastYear());
         platformStats.setTotalProfit30Days(
                 platformStats.getTotalSubscriptionPayments30Days() - platformStats.getTotalPayouts30Days());
         return platformStats;
