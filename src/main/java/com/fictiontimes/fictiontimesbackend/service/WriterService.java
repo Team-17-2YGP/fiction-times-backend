@@ -94,7 +94,7 @@ public class WriterService {
 
             writerRepository.resetWriterBalance(writer.getUserId());
         } else {
-            throw new UnauthorizedActionException("Invalid request, not enough balance to request a payout");
+            throw new UnauthorizedActionException("Invalid request, not enough balance to request a payoust");
         }
     }
 
