@@ -220,4 +220,8 @@ public class ReaderService {
     public void unlikeGenre(int userId, int genreId) throws DatabaseOperationException {
         readerRepository.unlikeGenre(userId, genreId);
     }
+
+    public ReaderStats getReaderStats(int readerId) throws DatabaseOperationException {
+        return readerRepository.getReaderStats(readerId);
+    }
 }

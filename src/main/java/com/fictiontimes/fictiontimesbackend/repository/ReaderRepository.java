@@ -588,4 +588,37 @@ public class ReaderRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public ReaderStats getReaderStats(int readerId) throws DatabaseOperationException {
+        try {
+            ReaderStats readerStats = new ReaderStats();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select sum(duration) as time from episode_time_data where readerId = ?"
+            );
+            statement.setInt(1, readerId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                readerStats.setTime(resultSet.getInt("time"));
+            }
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select count(*) as writers from reader_following where readerId = ?"
+            );
+            statement.setInt(1, readerId);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                readerStats.setWriterCount(resultSet.getInt("writers"));
+            }
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select count(episodeId) as episodes from episode_read where readerId = ?"
+            );
+            statement.setInt(1, readerId);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                readerStats.setEpisodeCount(resultSet.getInt("episodes"));
+            }
+            return readerStats;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
