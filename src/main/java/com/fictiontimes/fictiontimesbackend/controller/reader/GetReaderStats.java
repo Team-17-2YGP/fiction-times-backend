@@ -1,7 +1,9 @@
 package com.fictiontimes.fictiontimesbackend.controller.reader;
 
-import com.fictiontimes.fictiontimesbackend.model.DTO.ReaderEpisodeDTO;
-import com.fictiontimes.fictiontimesbackend.repository.*;
+import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
+import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
+import com.fictiontimes.fictiontimesbackend.repository.UserRepository;
+import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.service.ReaderService;
 import com.fictiontimes.fictiontimesbackend.utils.AuthUtils;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
@@ -12,18 +14,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 
-@WebServlet("/reader/bookmark/list")
-public class GetBookmarkListServlet extends HttpServlet {
+@WebServlet("/reader/stats")
+public class GetReaderStats extends HttpServlet {
 
     ReaderService readerService = new ReaderService(new UserRepository(), new ReaderRepository(),
             new WriterRepository(), new StoryRepository());
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
-        List<ReaderEpisodeDTO> bookmarkList = readerService.getBookmarkList(readerId);
-        response.getWriter().write(CommonUtils.getGson().toJson(bookmarkList));
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int readerId = AuthUtils.getUserId(request.getHeader("Authorization"));
+        response.getWriter().write(CommonUtils.getGson().toJson(readerService.getReaderStats(readerId)));
     }
 }
