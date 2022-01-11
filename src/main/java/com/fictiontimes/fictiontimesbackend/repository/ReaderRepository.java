@@ -589,6 +589,32 @@ public class ReaderRepository {
         }
     }
 
+    public List<Episode> getReadEpisodesByReader(int readerId) throws DatabaseOperationException {
+        try {
+            List<Episode> episodes = new ArrayList<>();
+            statement = DBConnection.getConnection().prepareStatement(
+                    "select episode.* from episode inner join episode_read er " +
+                            "on episode.episodeId = er.episodeId where readerId = ?"
+            );
+            statement.setInt(1, readerId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Episode episode = new Episode();
+                episode.setStoryId(resultSet.getInt("storyId"));
+                episode.setEpisodeId(resultSet.getInt("episodeId"));
+                episode.setEpisodeNumber(resultSet.getInt("episodeNUmber"));
+                episode.setTitle(resultSet.getString("title"));
+                episode.setDescription(resultSet.getString("description"));
+                episode.setReadCount(resultSet.getInt("readCount"));
+                episode.setUploadedAt(resultSet.getTimestamp("uploadedAt"));
+                episodes.add(episode);
+            }
+            return episodes;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
     public ReaderStats getReaderStats(int readerId) throws DatabaseOperationException {
         try {
             ReaderStats readerStats = new ReaderStats();
