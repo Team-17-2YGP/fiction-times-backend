@@ -158,6 +158,28 @@ public class ReaderService {
         return bookmarkList;
     }
 
+    public List<ReaderEpisodeDTO> getEpisodeListByStory(int storyId, int readerId) throws DatabaseOperationException {
+        List<Episode> episodeList = storyRepository.getEpisodeListByStoryId(storyId);
+        List<ReaderEpisodeDTO> episodeDTOList = new ArrayList<>();
+        for (Episode episode : episodeList) {
+            ReaderEpisodeDTO episodeDetails = new ReaderEpisodeDTO(
+                    episode.getEpisodeId(),
+                    episode.getStoryId(),
+                    episode.getEpisodeNumber(),
+                    episode.getTitle(),
+                    episode.getDescription(),
+                    episode.getReadCount(),
+                    episode.getUploadedAt(),
+                    null,
+                    storyRepository.finishedReading(readerId, episode.getEpisodeId()),
+                    true,
+                    storyRepository.getStoryById(episode.getStoryId())
+            );
+            episodeDTOList.add(episodeDetails);
+        }
+        return episodeDTOList;
+    }
+
     public void saveTimeData(TimeData timeData) throws DatabaseOperationException {
         timeData.setDuration(timeData.getClose().getTime() - timeData.getOpen().getTime());
         readerRepository.saveTimeData(timeData);
