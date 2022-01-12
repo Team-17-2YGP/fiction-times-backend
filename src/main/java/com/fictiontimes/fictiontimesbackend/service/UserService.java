@@ -153,4 +153,8 @@ public class UserService {
     public void resetPassword(User user) throws DatabaseOperationException {
         userRepository.updatePassword(user.getUserId(), DigestUtils.md5Hex(user.getPassword()));
     }
+
+    public String getReasonToBlock(int userId) throws DatabaseOperationException {
+        return userRepository.getReasonToBlockUser(userId);
+    }
 }

@@ -423,4 +423,21 @@ public class UserRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
+
+    public String getReasonToBlockUser(int userId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT reason FROM user_block_reason WHERE userId = ?"
+            );
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String reason = resultSet.getString("reason");
+                return reason;
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
 }
