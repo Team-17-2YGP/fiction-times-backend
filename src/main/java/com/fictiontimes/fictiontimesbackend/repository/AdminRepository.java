@@ -1,21 +1,18 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
-import com.fictiontimes.fictiontimesbackend.model.*;
+import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.BlockReasonDTO;
 import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.AdminPlatformStatsDTO;
-import com.fictiontimes.fictiontimesbackend.model.DTO.PayoutAdminDTO;
+import com.fictiontimes.fictiontimesbackend.model.*;
 import com.fictiontimes.fictiontimesbackend.model.Types.*;
 import com.fictiontimes.fictiontimesbackend.service.WriterService;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class AdminRepository {
@@ -224,9 +221,9 @@ public class AdminRepository {
                             "WHERE u.userType = ? AND u.firstName LIKE ? OR u.lastName LIKE ? OR u.userName LIKE ? ORDER BY u.userId DESC"
             );
             statement.setString(1, UserType.WRITER.toString());
-            statement.setString(2, "%"+userName+"%");
-            statement.setString(3, "%"+userName+"%");
-            statement.setString(4,"%"+userName+"%");
+            statement.setString(2, "%" + userName + "%");
+            statement.setString(3, "%" + userName + "%");
+            statement.setString(4, "%" + userName + "%");
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -267,7 +264,7 @@ public class AdminRepository {
                             "WHERE u.userType = ? AND u.userId LIKE ? ORDER BY u.userId DESC"
             );
             statement.setString(1, UserType.WRITER.toString());
-            statement.setString(2, "%"+userId+"%");
+            statement.setString(2, "%" + userId + "%");
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -318,8 +315,8 @@ public class AdminRepository {
                         resultSet.getString("branch"),
                         new java.util.Date(resultSet.getTimestamp("requestedAt").getTime()),
                         resultSet.getString("paymentSlipUrl"),
-                        resultSet.getTimestamp("completedAt") != null?
-                                new java.util.Date(resultSet.getTimestamp("completedAt").getTime()):
+                        resultSet.getTimestamp("completedAt") != null ?
+                                new java.util.Date(resultSet.getTimestamp("completedAt").getTime()) :
                                 null
                         ,
                         PayoutStatus.valueOf(resultSet.getString("status"))
@@ -348,8 +345,8 @@ public class AdminRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-  
-  public List<SubscriptionPayment> getSubscriptionPaymentList(int limit, int offset) throws DatabaseOperationException {
+
+    public List<SubscriptionPayment> getSubscriptionPaymentList(int limit, int offset) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT * FROM subscription_payment " +
@@ -385,8 +382,8 @@ public class AdminRepository {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-  
-  public List<SubscriptionPayment> searchSubscriptionPayments(String query) throws DatabaseOperationException {
+
+    public List<SubscriptionPayment> searchSubscriptionPayments(String query) throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT * FROM subscription_payment sp INNER JOIN user u ON sp.userId = u.userId " +
@@ -457,11 +454,11 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
-           } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-  
+
     public List<Reader> searchReadersByName(String userName) throws DatabaseOperationException {
         try {
             List<Reader> readersList = new ArrayList<>();
@@ -470,9 +467,9 @@ public class AdminRepository {
                             "WHERE u.userType = ? AND u.firstName LIKE ? OR u.lastName LIKE ? OR u.userName LIKE ? ORDER BY u.userId DESC"
             );
             statement.setString(1, UserType.READER.toString());
-            statement.setString(2, "%"+userName+"%");
-            statement.setString(3, "%"+userName+"%");
-            statement.setString(4,"%"+userName+"%");
+            statement.setString(2, "%" + userName + "%");
+            statement.setString(3, "%" + userName + "%");
+            statement.setString(4, "%" + userName + "%");
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -494,11 +491,11 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
-           } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-  
+
     public List<Reader> searchReadersById(int userId) throws DatabaseOperationException {
         try {
             List<Reader> readersList = new ArrayList<>();
@@ -507,7 +504,7 @@ public class AdminRepository {
                             "WHERE u.userType = ? AND u.userId LIKE ? ORDER BY u.userId DESC"
             );
             statement.setString(1, UserType.READER.toString());
-            statement.setString(2, "%"+userId+"%");
+            statement.setString(2, "%" + userId + "%");
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -529,11 +526,11 @@ public class AdminRepository {
                 readersList.add(reader);
             }
             return readersList;
-           } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
     }
-  
+
     public AdminPlatformStatsDTO getPlatformStats() throws DatabaseOperationException {
         try {
             statement = DBConnection.getConnection().prepareStatement(
@@ -567,7 +564,7 @@ public class AdminRepository {
 
             ResultSet resultSet = statement.executeQuery();
             AdminPlatformStatsDTO platformStats = new AdminPlatformStatsDTO();
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 platformStats.setTotalReaderCount(resultSet.getInt("totalReaderCount"));
                 platformStats.setTotalWriterCount(resultSet.getInt("totalWriterCount"));
                 platformStats.setTotalAdminCount(resultSet.getInt("totalAdminCount"));
@@ -696,5 +693,217 @@ public class AdminRepository {
         } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new DatabaseOperationException(e.getMessage());
         }
+    }
+
+    public PlatformReport getPlatformReportById(int reportId) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM platform_report WHERE reportId = ?"
+            );
+            statement.setInt(1, reportId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return createPlatformReport(resultSet);
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public PlatformReport getPlatformReportByDate(Timestamp reportDate) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM platform_report WHERE reportDate = ?"
+            );
+            statement.setTimestamp(1, reportDate);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return createPlatformReport(resultSet);
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public PlatformReport getLastPlatformReport() throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM platform_report ORDER BY reportDate DESC LIMIT 1"
+            );
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return createPlatformReport(resultSet);
+            }
+            return null;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public List<PlatformReport> getPlatformReportList(int limit, int offset) throws DatabaseOperationException {
+        List<PlatformReport> platformReports = new ArrayList<>();
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT * FROM platform_report ORDER BY reportDate DESC LIMIT ? OFFSET ?"
+            );
+            statement.setInt(1, limit);
+            statement.setInt(2, offset);
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                platformReports.add(createPlatformReport(resultSet));
+            }
+            return platformReports;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    private PlatformReport createPlatformReport(ResultSet resultSet) throws SQLException {
+        PlatformReport platformReport = new PlatformReport();
+        platformReport.setReportId(resultSet.getInt("reportId"));
+        platformReport.setGeneratedAt(resultSet.getTimestamp("generatedAt"));
+        platformReport.setReportDate(resultSet.getTimestamp("reportDate"));
+        platformReport.setReaderCount(resultSet.getInt("readerCount"));
+        platformReport.setWriterCount(resultSet.getInt("writerCount"));
+        platformReport.setApplicantCount(resultSet.getInt("applicantCount"));
+        platformReport.setUserCount(resultSet.getInt("totalUserCount"));
+        platformReport.setWriterRegistrations(resultSet.getInt("writerRegistrations"));
+        platformReport.setReaderRegistrations(resultSet.getInt("readerRegistrations"));
+        platformReport.setSubscriptionPayments(resultSet.getDouble("subscriptionPayments"));
+        platformReport.setPayouts(resultSet.getDouble("payouts"));
+        platformReport.setProfit(resultSet.getDouble("profit"));
+
+        platformReport.setReaderCountInc(resultSet.getDouble("readerCountInc"));
+        platformReport.setWriterCountInc(resultSet.getDouble("writerCountInc"));
+        platformReport.setApplicantCountInc(resultSet.getDouble("applicantCountInc"));
+        platformReport.setUserCountInc(resultSet.getDouble("totalUserCountInc"));
+        platformReport.setWriterRegistrationsInc(resultSet.getDouble("writerRegistrationsInc"));
+        platformReport.setReaderRegistrationsInc(resultSet.getDouble("readerRegistrationsInc"));
+        platformReport.setSubscriptionPaymentsInc(resultSet.getDouble("subscriptionPaymentsInc"));
+        platformReport.setPayoutsInc(resultSet.getDouble("payoutsInc"));
+        platformReport.setProfitInc(resultSet.getDouble("profitInc"));
+        return platformReport;
+    }
+
+    public void generatePlatformReport(Timestamp startDate, Timestamp endDate) throws DatabaseOperationException {
+        try {
+            statement = DBConnection.getConnection().prepareStatement(
+                    "SELECT (SELECT COUNT(*) FROM user u WHERE userType='READER' " +
+                            "   AND u.timestamp < ?) as readerCount, " +
+                            "(SELECT COUNT(*) FROM user u WHERE userType='WRITER' " +
+                            "   AND u.timestamp < ?) as writerCount, " +
+                            "(SELECT COUNT(*) FROM user u WHERE userType='WRITER_APPLICANT' " +
+                            "   AND u.timestamp < ?) as applicantCount, " +
+                            "(SELECT COUNT(*) FROM user u WHERE u.timestamp < ?) as userCount, " +
+                            "(SELECT COUNT(*) FROM user u WHERE u.userType='WRITER' " +
+                            "   AND u.timestamp > ? AND u.timestamp < ?) as writerRegistrations, " +
+                            "(SELECT COUNT(*) FROM user u WHERE u.userType='READER' " +
+                            "   AND u.timestamp > ? AND u.timestamp < ?) as readerRegistrations, " +
+                            "(SELECT SUM(amount) FROM subscription_payment WHERE status='RECURRING_INSTALLMENT_SUCCESS' " +
+                            "   AND timestamp > ? AND timestamp < ?) as subscriptionPayments, " +
+                            "(SELECT SUM(amount) FROM payout WHERE completedAt > ? AND completedAt < ?) as payouts"
+            );
+
+            statement.setTimestamp(1, endDate);
+            statement.setTimestamp(2, endDate);
+            statement.setTimestamp(3, endDate);
+            statement.setTimestamp(4, endDate);
+            statement.setTimestamp(5, startDate);
+            statement.setTimestamp(6, endDate);
+            statement.setTimestamp(7, startDate);
+            statement.setTimestamp(8, endDate);
+            statement.setTimestamp(9, startDate);
+            statement.setTimestamp(10, endDate);
+            statement.setTimestamp(11, startDate);
+            statement.setTimestamp(12, endDate);
+
+            ResultSet resultSet = statement.executeQuery();
+            PlatformReport platformReport = new PlatformReport();
+            if (resultSet.next()) {
+                platformReport.setGeneratedAt(new Timestamp(new java.util.Date().getTime()));
+                platformReport.setReportDate(endDate);
+                platformReport.setReaderCount(resultSet.getInt("readerCount"));
+                platformReport.setWriterCount(resultSet.getInt("writerCount"));
+                platformReport.setApplicantCount(resultSet.getInt("applicantCount"));
+                platformReport.setUserCount(resultSet.getInt("userCount"));
+                platformReport.setWriterRegistrations(resultSet.getInt("writerRegistrations"));
+                platformReport.setReaderRegistrations(resultSet.getInt("readerRegistrations"));
+                platformReport.setSubscriptionPayments(resultSet.getDouble("subscriptionPayments"));
+                platformReport.setPayouts(resultSet.getDouble("payouts"));
+                platformReport.setProfit(platformReport.getSubscriptionPayments() - platformReport.getPayouts());
+            }
+
+            PlatformReport lastPlatformReport = getLastPlatformReport();
+            if (lastPlatformReport == null) { // If this is the first platform report
+                platformReport.setReaderCountInc(100.0);
+                platformReport.setWriterCountInc(100.0);
+                platformReport.setApplicantCountInc(100.0);
+                platformReport.setUserCountInc(100.0);
+                platformReport.setWriterRegistrationsInc(100.0);
+                platformReport.setReaderRegistrationsInc(100.0);
+                platformReport.setSubscriptionPaymentsInc(100.0);
+                platformReport.setPayoutsInc(100.0);
+                platformReport.setProfitInc(100.0);
+            } else {
+                platformReport.setReaderCountInc(getIncrement(platformReport.getReaderCount(),
+                        lastPlatformReport.getReaderCount()));
+                platformReport.setWriterCountInc(getIncrement(platformReport.getWriterCount(),
+                        lastPlatformReport.getWriterCount()));
+                platformReport.setApplicantCountInc(getIncrement(platformReport.getApplicantCount(),
+                        lastPlatformReport.getApplicantCount()));
+                platformReport.setUserCountInc(getIncrement(platformReport.getUserCount(),
+                        lastPlatformReport.getUserCount()));
+                platformReport.setWriterRegistrationsInc(getIncrement(platformReport.getWriterRegistrations(),
+                        lastPlatformReport.getWriterRegistrations()));
+                platformReport.setReaderRegistrationsInc(getIncrement(platformReport.getReaderRegistrations(),
+                        lastPlatformReport.getReaderRegistrations()));
+                platformReport.setSubscriptionPaymentsInc(getIncrement(platformReport.getSubscriptionPayments(),
+                        lastPlatformReport.getSubscriptionPayments()));
+                platformReport.setPayoutsInc(getIncrement(platformReport.getPayouts(), lastPlatformReport.getPayouts()));
+                platformReport.setProfitInc(getIncrement(platformReport.getProfit(), lastPlatformReport.getProfit()));
+            }
+
+            statement = DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO platform_report (generatedAt, reportDate, readerCount, writerCount, applicantCount, " +
+                            "totalUserCount, writerRegistrations, readerRegistrations, subscriptionPayments, payouts, profit, " +
+                            "readerCountInc, writerCountInc, applicantCountInc, totalUserCountInc, writerRegistrationsInc, " +
+                            "readerRegistrationsInc, subscriptionPaymentsInc, payoutsInc, profitInc) " +
+                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            statement.setTimestamp(1, platformReport.getGeneratedAt());
+            statement.setTimestamp(2, platformReport.getReportDate());
+            statement.setInt(3, platformReport.getReaderCount());
+            statement.setInt(4, platformReport.getWriterCount());
+            statement.setInt(5, platformReport.getApplicantCount());
+            statement.setInt(6, platformReport.getUserCount());
+            statement.setInt(7, platformReport.getWriterRegistrations());
+            statement.setInt(8, platformReport.getReaderRegistrations());
+            statement.setDouble(9, platformReport.getSubscriptionPayments());
+            statement.setDouble(10, platformReport.getPayouts());
+            statement.setDouble(11, platformReport.getProfit());
+
+            statement.setDouble(12, platformReport.getReaderCountInc());
+            statement.setDouble(13, platformReport.getWriterCountInc());
+            statement.setDouble(14, platformReport.getApplicantCountInc());
+            statement.setDouble(15, platformReport.getUserCountInc());
+            statement.setDouble(16, platformReport.getWriterRegistrationsInc());
+            statement.setDouble(17, platformReport.getReaderRegistrationsInc());
+            statement.setDouble(18, platformReport.getSubscriptionPaymentsInc());
+            statement.setDouble(19, platformReport.getPayoutsInc());
+            statement.setDouble(20, platformReport.getProfitInc());
+
+            statement.execute();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    private double getIncrement(double current, double last) {
+        if (last == 0.0) return 100.0;
+        return ((current - last) / last) * 100.0;
     }
 }

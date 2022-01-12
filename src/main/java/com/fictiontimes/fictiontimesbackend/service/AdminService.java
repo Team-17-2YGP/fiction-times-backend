@@ -9,11 +9,13 @@ import com.fictiontimes.fictiontimesbackend.repository.ReaderRepository;
 import com.fictiontimes.fictiontimesbackend.repository.StoryRepository;
 import com.fictiontimes.fictiontimesbackend.repository.WriterRepository;
 import com.fictiontimes.fictiontimesbackend.utils.CommonUtils;
+import com.fictiontimes.fictiontimesbackend.utils.DateUtils;
 import com.fictiontimes.fictiontimesbackend.utils.EmailUtils;
 import com.fictiontimes.fictiontimesbackend.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -203,5 +205,25 @@ public class AdminService{
 
     public List<Story> searchStoryById(int storyId) throws DatabaseOperationException {
         return storyRepository.searchStoryById(storyId);
+    }
+
+    public List<PlatformReport> getPlatformReportList(int limit, int offset) throws DatabaseOperationException {
+        LocalDateTime now = LocalDateTime.now();
+        Timestamp lastMonthBeginning = Timestamp.valueOf(
+                LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 0).minusMonths(1)
+        );
+        Timestamp thisMonthBeginning = Timestamp.valueOf(
+                LocalDateTime.of(now.getYear() , now.getMonth(), 1, 0, 0, 0)
+        );
+
+        PlatformReport lastReport = adminRepository.getPlatformReportByDate(thisMonthBeginning);
+        if(lastReport == null) {
+            adminRepository.generatePlatformReport(lastMonthBeginning, thisMonthBeginning);
+        }
+        return adminRepository.getPlatformReportList(limit, offset);
+    }
+
+    public PlatformReport getPlatformReportById(int reportId) throws DatabaseOperationException {
+        return adminRepository.getPlatformReportById(reportId);
     }
 }
