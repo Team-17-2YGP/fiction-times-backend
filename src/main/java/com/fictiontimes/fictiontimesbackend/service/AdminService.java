@@ -226,4 +226,8 @@ public class AdminService{
     public PlatformReport getPlatformReportById(int reportId) throws DatabaseOperationException {
         return adminRepository.getPlatformReportById(reportId);
     }
+
+    public PlatformReport getPlatformReportByDateRange(Timestamp startDate, Timestamp endDate) throws DatabaseOperationException{
+        return adminRepository.getPlatformReportByDateRange(startDate, endDate);
+    }
 }

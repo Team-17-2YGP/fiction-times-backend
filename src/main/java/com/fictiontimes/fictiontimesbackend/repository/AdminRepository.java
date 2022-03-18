@@ -788,8 +788,8 @@ public class AdminRepository {
         return platformReport;
     }
 
-    public void generatePlatformReport(Timestamp startDate, Timestamp endDate) throws DatabaseOperationException {
-        try {
+    public PlatformReport getPlatformReportByDateRange(Timestamp startDate, Timestamp endDate) throws DatabaseOperationException {
+        try{
             statement = DBConnection.getConnection().prepareStatement(
                     "SELECT (SELECT COUNT(*) FROM user u WHERE userType='READER' " +
                             "   AND u.timestamp < ?) as readerCount, " +
@@ -835,6 +835,16 @@ public class AdminRepository {
                 platformReport.setPayouts(resultSet.getDouble("payouts"));
                 platformReport.setProfit(platformReport.getSubscriptionPayments() - platformReport.getPayouts());
             }
+            return platformReport;
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new DatabaseOperationException(e.getMessage());
+        }
+    }
+
+    public void generatePlatformReport(Timestamp startDate, Timestamp endDate) throws DatabaseOperationException {
+        try {
+            PlatformReport platformReport = getPlatformReportByDateRange(startDate, endDate);
 
             PlatformReport lastPlatformReport = getLastPlatformReport();
             if (lastPlatformReport == null) { // If this is the first platform report
