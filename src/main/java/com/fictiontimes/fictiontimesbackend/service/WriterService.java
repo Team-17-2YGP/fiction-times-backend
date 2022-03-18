@@ -124,4 +124,12 @@ public class WriterService {
         stats.setStories(stories);
         return stats;
     }
+
+    public List<Story> searchStoryByTitle(String storyTitle) throws DatabaseOperationException {
+        return storyRepository.searchStoryByTitle(storyTitle);
+    }
+
+    public List<Story> searchStoryById(int storyId) throws DatabaseOperationException {
+        return storyRepository.searchStoryById(storyId);
+    }
 }

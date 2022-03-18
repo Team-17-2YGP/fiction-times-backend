@@ -16,11 +16,8 @@ public class ApplicantInterceptor implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String token = null;
-        System.out.println("applicant interceptor");
         try {
-            System.out.println("bef tokknero");
             token = AuthUtils.extractAuthToken(request);
-            System.out.println(token);
         } catch (TokenNotFoundException e) {
             HttpServletResponse response = (HttpServletResponse) servletResponse;
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -31,7 +28,6 @@ public class ApplicantInterceptor implements Filter {
         if (token != null) {
             try {
                 if (AuthUtils.isAuthorised(token, UserType.WRITER_APPLICANT)) {
-                    System.out.println("inside authorize3d");
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
                     isNotAuthorised = true;
