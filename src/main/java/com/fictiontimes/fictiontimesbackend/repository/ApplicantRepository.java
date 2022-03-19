@@ -1,6 +1,8 @@
 package com.fictiontimes.fictiontimesbackend.repository;
 
 import com.fictiontimes.fictiontimesbackend.exception.DatabaseOperationException;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserStatus;
+import com.fictiontimes.fictiontimesbackend.model.Types.UserType;
 import com.fictiontimes.fictiontimesbackend.model.User;
 import com.fictiontimes.fictiontimesbackend.model.WriterApplicant;
 
@@ -51,6 +53,8 @@ public class ApplicantRepository {
                 applicant.setCountry(correspondingUser.getCountry());
                 applicant.setPhoneNumber(correspondingUser.getPhoneNumber());
                 applicant.setProfilePictureUrl(correspondingUser.getProfilePictureUrl());
+                applicant.setUserType(correspondingUser.getUserType());
+                applicant.setUserStatus(correspondingUser.getUserStatus());
                 return applicant;
             }
             return null;
