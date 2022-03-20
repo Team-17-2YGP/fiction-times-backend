@@ -25,6 +25,11 @@ public class GetEpisodeDetailsServlet extends HttpServlet {
         int readerId = AuthUtils.getUserId(AuthUtils.extractAuthToken(request));
         int episodeId = Integer.parseInt(request.getParameter("id"));
         ReaderEpisodeDTO episode = storyService.getEpisodeDetails(readerId, episodeId);
+        if (episode == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Episode not found\"}");
+            return;
+        }
         response.getWriter().write(CommonUtils.getGson().toJson(episode));
     }
 }

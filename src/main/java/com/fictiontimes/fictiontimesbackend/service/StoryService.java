@@ -232,7 +232,10 @@ public class StoryService {
 
     public ReaderEpisodeDTO getEpisodeDetails(int readerId, int episodeId) throws DatabaseOperationException{
         Episode episode = storyRepository.getEpisodeById(episodeId);
-        ReaderEpisodeDTO episodeDetails = new ReaderEpisodeDTO(
+        if(episode == null) {
+            return  null;
+        }
+        return new ReaderEpisodeDTO(
                 episode.getEpisodeId(),
                 episode.getStoryId(),
                 episode.getEpisodeNumber(),
@@ -245,7 +248,6 @@ public class StoryService {
                 storyRepository.isBookmarkedEpisode(readerId, episodeId),
                 storyRepository.getStoryById(episode.getStoryId())
         );
-        return  episodeDetails;
     }
 
     /** Check if the episode belong to the writer and return the episode details */
