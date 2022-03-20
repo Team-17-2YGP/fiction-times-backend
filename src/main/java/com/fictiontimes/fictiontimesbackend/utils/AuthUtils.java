@@ -29,7 +29,8 @@ public class AuthUtils {
 
     public static boolean isAuthorised(String token, UserType endpointRole) throws TokenExpiredException {
         String[] destructuredToken = token.split("\\.");
-        if (!DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
+        if (destructuredToken.length < 2 ||
+                !DigestUtils.sha256Hex(destructuredToken[0] + secret).equals(destructuredToken[1])) {
             return false;
         }
         String tokenBodyString = new String(Base64.getDecoder().decode(destructuredToken[0]), StandardCharsets.UTF_8);
