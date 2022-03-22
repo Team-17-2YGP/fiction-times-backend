@@ -96,7 +96,7 @@ public class FileUtils {
         return content;
     }
 
-    private static AmazonS3 getAWSClient() throws IOException {
+    public static AmazonS3 getAWSClient() throws IOException {
         // Load properties
         if (s3Client == null) {
             Properties properties = new Properties();
