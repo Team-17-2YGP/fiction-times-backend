@@ -18,7 +18,7 @@ public class EmailUtils {
     private static Session session = null;
     private static final Logger logger = Logger.getLogger(ReaderService.class.getName());
 
-    private static Session getSession() throws IOException {
+    public static Session getSession() throws IOException {
         if (session == null) {
             Properties properties = new Properties();
             properties.load(EmailUtils.class.getResourceAsStream("/email.properties"));
