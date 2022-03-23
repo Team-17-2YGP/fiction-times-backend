@@ -11,9 +11,12 @@ public class CORSInterceptor implements Filter {
     private static final String[] allowedOrigins = {
             "http://localhost:3000", "http://localhost:5500", "http://localhost:5501",
             "http://127.0.0.1:3000", "http://127.0.0.1:5500", "http://127.0.0.1:5501",
-            "http://46.101.159.4", "https://46.101.159.4", "http://46.101.159.4:8181", 
+            "http://46.101.159.4", "http://46.101.159.4:8181", "http://www.fictiontimes.live",
             "http://fictiontimes.live", "http://fictiontimes.live:81", "http://fictiontimes.live:82",
-            "http://fictiontimes.live:83",  "http://fictiontimes.live:8181"
+            "http://fictiontimes.live:83",  "http://fictiontimes.live:8181",
+            "https://46.101.159.4", "https://46.101.159.4:8181", "https://www.fictiontimes.live",
+            "https://fictiontimes.live", "https://fictiontimes.live:81", "https://fictiontimes.live:82",
+            "https://fictiontimes.live:83",  "https://fictiontimes.live:8181"
     };
 
     @Override
