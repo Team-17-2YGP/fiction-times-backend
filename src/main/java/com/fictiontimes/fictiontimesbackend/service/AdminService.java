@@ -107,7 +107,7 @@ public class AdminService{
                 0,
                 payout.getWriterId(),
                 "Payout complete",
-                "LKR " + payout.getAmount() + " . " + payout.getBank(),
+                "LKR " + Math.round(payout.getAmount()*100)/100 + " . " + payout.getBank(),
                 CommonUtils.getFrontendAddress() + "/dashboard/writer/?page=payouts&payoutId=" + payout.getPayoutId(),
                 false,
                 new Timestamp(new Date().getTime())
