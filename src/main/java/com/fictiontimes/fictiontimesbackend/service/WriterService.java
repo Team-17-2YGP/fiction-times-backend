@@ -85,7 +85,7 @@ public class WriterService {
                     0,
                     0,
                     "New writer payout request",
-                    writer.getFirstName() + " " + writer.getLastName() + " . LKR " + payout.getAmount(),
+                    writer.getFirstName() + " " + writer.getLastName() + " . LKR " + Math.round(payout.getAmount()*100)/100,
                     CommonUtils.getFrontendAddress() + "/dashboard/admin/?page=transactions",
                     false,
                     new Timestamp(new Date().getTime())
